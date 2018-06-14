@@ -1,0 +1,73 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'io.objectbox'
+
+repositories {
+    maven { url "http://objectbox.net/beta-repo/" }
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion Configs.compileSdk
+    defaultConfig {
+        applicationId Configs.appId
+        minSdkVersion Configs.minSdk
+        targetSdkVersion Configs.targetSdk
+        versionCode Configs.versionCode
+        versionName Configs.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$Configs.kotlin"
+
+    implementation Deps.supportLibs
+    implementation Deps.architecture
+
+    implementation Deps.dagger2
+    kapt Deps.dagger2Annotation
+
+    implementation "com.google.code.gson:gson:$Version.gson"
+
+    implementation "com.github.bumptech.glide:glide:$Version.glide"
+    kapt "com.github.bumptech.glide:compiler:$Version.glide"
+
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$Version.leakCanary"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$Version.leakCanary"
+
+    implementation "io.reactivex.rxjava2:rxandroid:$Version.rxAndroid"
+    implementation "io.reactivex.rxjava2:rxjava:$Version.rxJava"
+
+    implementation "io.objectbox:objectbox-rxjava:$Version.objectBoxRxJava"
+    implementation "com.jakewharton.timber:timber:$Version.timber"
+
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$Version.leakCanary"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$Version.leakCanary"
+
+    implementation "com.google.android.gms:play-services-maps:$Version.playService"
+
+    // testing
+    testImplementation "junit:junit:$Version.junit"
+    androidTestImplementation "com.android.support.test:runner:$Version.testRunner"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$Version.espresso"
+}
