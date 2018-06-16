@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.partial_app_bar.view.*
 import javax.inject.Inject
 import android.support.v7.widget.RecyclerView
 import ductranit.me.trackme.ui.widgets.VerticalSpaceItemDecoration
+import ductranit.me.trackme.utils.Constants.Companion.SESSION_ID
 
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     private lateinit var adapter: SessionAdapter
@@ -39,8 +40,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
         adapter = SessionAdapter(
                 appExecutors = appExecutors
-        ) { _ ->
+        ) { session ->
             val intent = Intent(this, TrackingActivity::class.java)
+            intent.putExtra(SESSION_ID, session.id)
             startActivity(intent)
         }
 

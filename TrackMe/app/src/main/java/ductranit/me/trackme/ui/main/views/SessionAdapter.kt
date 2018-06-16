@@ -2,7 +2,7 @@ package ductranit.me.trackme.ui.main.views
 
 import android.arch.lifecycle.LifecycleObserver
 import android.databinding.DataBindingUtil
-import android.graphics.Color
+import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -67,7 +67,6 @@ class SessionAdapter(appExecutors: AppExecutors,
     override fun bind(holder: DataBoundViewHolder<SessionItemBinding>, item: Session) {
         val sessionViewHolder = holder as SessionViewHolder
         sessionViewHolder.binding.session = item
-        sessionViewHolder.binding.mapView.tag = LatLng(52.3905217, 9.6996769)
         sessionViewHolder.setMapLocation(item)
     }
 
@@ -95,7 +94,7 @@ class SessionAdapter(appExecutors: AppExecutors,
 
             options.width(5f)
             options.visible(true)
-            options.color(Color.parseColor("#CC0000FF"))
+            options.color(ContextCompat.getColor(binding.root.context, R.color.colorMapPath))
             val locations = ArrayList<LatLng>()
             locations.add(LatLng(10.8269675, 106.7057734))
             locations.add(LatLng(10.8269675, 106.7057734))
