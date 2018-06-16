@@ -10,5 +10,25 @@
         tools:context=".ui.main.views.MainActivity"
         tools:showIn="@layout/activity_main">
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvSession"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="@dimen/item_pad"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/fabRecord"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/item_session" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabRecord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/item_pad"
+            android:src="@drawable/ic_record"
+            app:fabSize="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </android.support.constraint.ConstraintLayout>
 </layout>

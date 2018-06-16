@@ -11,9 +11,6 @@
             android:id="@+id/layoutAppBar"
             layout="@layout/partial_app_bar" />
 
-        <include
-            android:id="@+id/layoutMain"
-            layout="@layout/content_main" />
-
+        <include layout="@layout/content_tracking"/>
     </android.support.design.widget.CoordinatorLayout>
 </layout>

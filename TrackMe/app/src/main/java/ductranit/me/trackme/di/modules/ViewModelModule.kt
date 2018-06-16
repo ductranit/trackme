@@ -26,6 +26,7 @@ import dagger.multibindings.IntoMap
 import ductranit.me.trackme.di.ViewModelKey
 import ductranit.me.trackme.utils.ViewModelFactory
 import ductranit.me.trackme.ui.main.viewmodels.MainViewModel
+import ductranit.me.trackme.ui.record.viewmodels.TrackingViewModel
 
 @Suppress("unused")
 @Module
@@ -33,7 +34,12 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(MainViewModel::class)
-    abstract fun bindMainViewModel(mainViewModel: MainViewModel): ViewModel
+    abstract fun bindMainViewModel(viewModel: MainViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(TrackingViewModel::class)
+    abstract fun bindRecordViewModel(viewModel: TrackingViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory

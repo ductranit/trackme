@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package ductranit.me.trackme.ui.widgets
 
-package ductranit.me.trackme.di.modules
+import android.databinding.ViewDataBinding
+import android.support.v7.widget.RecyclerView
 
 
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
-import ductranit.me.trackme.ui.main.views.MainActivity
-import ductranit.me.trackme.ui.record.views.TrackingActivity
-
-@Suppress("unused")
-@Module
-abstract class ActivityModule {
-    @ContributesAndroidInjector(modules = [FragmentBuildersModule::class])
-    abstract fun contributeMainActivity(): MainActivity
-
-    @ContributesAndroidInjector(modules = [FragmentBuildersModule::class])
-    abstract fun contributeRecordActivity(): TrackingActivity
-}
+/**
+ * A generic ViewHolder that works with a [ViewDataBinding].
+ * @param <T> The type of the ViewDataBinding.
+</T> */
+open class DataBoundViewHolder<out T : ViewDataBinding> constructor(val binding: T) :
+        RecyclerView.ViewHolder(binding.root)

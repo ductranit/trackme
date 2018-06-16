@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="session"
+            type="ductranit.me.trackme.models.Session" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
+            app:liteMode="true"
+            app:mapType="none"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_map_height" />
+
+        <TextView
+            android:id="@+id/tvDistance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/tvAvgSpeed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mapView"
+            android:text="@{Integer.toString(session.distance)}"
+            tools:text="11 km" />
+
+        <TextView
+            android:id="@+id/tvDistanceTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/distance"
+            app:layout_constraintEnd_toStartOf="@id/tvAvgSpeedTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDistance" />
+
+        <android.support.constraint.Barrier
+            android:id="@+id/barrier1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="tvDistance,tvAvgSpeed" />
+
+        <TextView
+            android:id="@+id/tvAvgSpeed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@{Integer.toString(session.averageSpeed)}"
+            app:layout_constraintEnd_toStartOf="@+id/tvTime"
+            app:layout_constraintStart_toEndOf="@id/tvDistance"
+            app:layout_constraintTop_toBottomOf="@+id/mapView"
+            tools:text="11 km/h" />
+
+        <TextView
+            android:id="@+id/tvAvgSpeedTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/avg_speed"
+            app:layout_constraintEnd_toStartOf="@id/tvTime"
+            app:layout_constraintStart_toEndOf="@id/tvDistanceTitle"
+            app:layout_constraintTop_toBottomOf="@+id/tvAvgSpeed" />
+
+        <android.support.constraint.Barrier
+            android:id="@+id/barrier2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="tvDistanceTitle,tvAvgSpeedTitle" />
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tvAvgSpeedTitle"
+            app:layout_constraintTop_toBottomOf="@+id/mapView"
+            app:textDate="@{session.startTime}"
+            tools:text="10:10:20" />
+    </android.support.constraint.ConstraintLayout>
+</layout>

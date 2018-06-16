@@ -7,6 +7,8 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import ductranit.me.trackme.di.AppInjector
 import javax.inject.Inject
+import timber.log.Timber
+
 
 class GlobalApp : Application(), HasActivityInjector {
     @Inject
@@ -16,6 +18,7 @@ class GlobalApp : Application(), HasActivityInjector {
         super.onCreate()
         AppInjector.init(this)
         initLeakCanary()
+        initLog()
     }
 
     override fun activityInjector() = dispatchingAndroidInjector
@@ -26,5 +29,11 @@ class GlobalApp : Application(), HasActivityInjector {
         }
 
         LeakCanary.install(this)
+    }
+
+    private fun initLog() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
     }
 }
