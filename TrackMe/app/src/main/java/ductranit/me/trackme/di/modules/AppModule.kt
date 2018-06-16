@@ -18,12 +18,14 @@ package ductranit.me.trackme.di.modules
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Resources
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import ductranit.me.trackme.models.MyObjectBox
+import ductranit.me.trackme.utils.Constants.Companion.SHARE_PREF_NAME
 import io.objectbox.BoxStore
 import javax.inject.Singleton
 
@@ -52,5 +54,11 @@ class AppModule {
     @Provides
     fun provideGson(): Gson {
         return GsonBuilder().create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharePreference(app: Application): SharedPreferences {
+        return app.getSharedPreferences(SHARE_PREF_NAME, 0)
     }
 }

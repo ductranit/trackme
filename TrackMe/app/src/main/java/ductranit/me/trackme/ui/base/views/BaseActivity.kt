@@ -1,6 +1,7 @@
 package ductranit.me.trackme.ui.base.views
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -34,6 +35,10 @@ abstract class BaseActivity<V : ViewDataBinding, M : ViewModel> : AppCompatActiv
     override fun supportFragmentInjector() = dispatchingAndroidInjector
 
     protected abstract fun layoutId(): Int
+
+    protected fun getActivity(): Activity {
+        return this
+    }
 
     private fun bindingView(layoutId: Int): V {
         return DataBindingUtil.setContentView(this, layoutId)

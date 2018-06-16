@@ -3,4 +3,7 @@
     <string name="distance">Distance</string>
     <string name="avg_speed">Avg. Speed</string>
     <string name="record">Record</string>
+
+    <string name="msg_location_permission">App needs to access your device location to track your work out</string>
+    <string name="msg_location_permission_disable">Please go to setting and accept location permission before using app</string>
 </resources>
