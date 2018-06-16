@@ -1,4 +1,4 @@
-package ductranit.me.trackme.ui.record.viewmodels
+package ductranit.me.trackme.ui.tracking.viewmodels
 
 import ductranit.me.trackme.ui.base.viewmodels.BaseViewModel
 import javax.inject.Inject

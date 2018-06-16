@@ -20,7 +20,7 @@ package ductranit.me.trackme.di.modules
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import ductranit.me.trackme.ui.main.views.MainActivity
-import ductranit.me.trackme.ui.record.views.TrackingActivity
+import ductranit.me.trackme.ui.tracking.views.TrackingActivity
 
 @Suppress("unused")
 @Module

@@ -26,7 +26,7 @@ import dagger.multibindings.IntoMap
 import ductranit.me.trackme.di.ViewModelKey
 import ductranit.me.trackme.utils.ViewModelFactory
 import ductranit.me.trackme.ui.main.viewmodels.MainViewModel
-import ductranit.me.trackme.ui.record.viewmodels.TrackingViewModel
+import ductranit.me.trackme.ui.tracking.viewmodels.TrackingViewModel
 
 @Suppress("unused")
 @Module

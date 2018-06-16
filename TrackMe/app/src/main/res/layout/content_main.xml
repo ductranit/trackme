@@ -13,12 +13,11 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvSession"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginBottom="@dimen/item_pad"
+            android:layout_height="match_parent"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@+id/fabRecord"
+            app:layout_constraintBottom_toTopOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/item_session" />
+            tools:listitem="@layout/session_item" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabRecord"
@@ -27,6 +26,7 @@
             android:layout_marginBottom="@dimen/item_pad"
             android:src="@drawable/ic_record"
             app:fabSize="normal"
+            android:scaleType="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

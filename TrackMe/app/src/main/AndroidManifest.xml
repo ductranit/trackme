@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.record.views.TrackingActivity"/>
+        <activity android:name=".ui.tracking.views.TrackingActivity"/>
     </application>
 
 </manifest>

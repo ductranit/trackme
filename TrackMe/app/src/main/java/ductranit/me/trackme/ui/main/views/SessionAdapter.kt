@@ -1,8 +1,8 @@
 package ductranit.me.trackme.ui.main.views
 
 import android.arch.lifecycle.LifecycleObserver
-import android.content.Context
 import android.databinding.DataBindingUtil
+import android.graphics.Color
 import android.support.v7.util.DiffUtil
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,16 +11,17 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolylineOptions
 import ductranit.me.trackme.R
-import ductranit.me.trackme.databinding.ItemSessionBinding
+import ductranit.me.trackme.databinding.SessionItemBinding
 import ductranit.me.trackme.models.Session
 import ductranit.me.trackme.ui.widgets.DataBoundListAdapter
 import ductranit.me.trackme.ui.widgets.DataBoundViewHolder
 import ductranit.me.trackme.utils.AppExecutors
 
-class SessionAdapter(private val context: Context, appExecutors: AppExecutors,
+class SessionAdapter(appExecutors: AppExecutors,
                      private val itemClickCallback: ((Session) -> Unit)?) :
-        DataBoundListAdapter<Session, ItemSessionBinding>(
+        DataBoundListAdapter<Session, SessionItemBinding>(
                 appExecutors = appExecutors,
                 diffCallback = object : DiffUtil.ItemCallback<Session>() {
                     override fun areItemsTheSame(oldItem: Session, newItem: Session): Boolean {
@@ -36,10 +37,10 @@ class SessionAdapter(private val context: Context, appExecutors: AppExecutors,
                 }
         ), LifecycleObserver {
 
-    override fun createBinding(parent: ViewGroup): ItemSessionBinding {
-        val binding = DataBindingUtil.inflate<ItemSessionBinding>(
+    override fun createBinding(parent: ViewGroup): SessionItemBinding {
+        val binding = DataBindingUtil.inflate<SessionItemBinding>(
                 LayoutInflater.from(parent.context),
-                R.layout.item_session,
+                R.layout.session_item,
                 parent,
                 false
         )
@@ -50,23 +51,28 @@ class SessionAdapter(private val context: Context, appExecutors: AppExecutors,
             }
         }
 
+        binding.mapView.isClickable = false
+
         return binding
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DataBoundViewHolder<ItemSessionBinding> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DataBoundViewHolder<SessionItemBinding> {
         val binding = createBinding(parent)
         val viewHolder = SessionViewHolder(binding)
         binding.mapView.onCreate(null)
         binding.mapView.getMapAsync(viewHolder)
-        return viewHolder;
+        return viewHolder
     }
 
-    override fun bind(binding: ItemSessionBinding, item: Session) {
-        binding.session = item
+    override fun bind(holder: DataBoundViewHolder<SessionItemBinding>, item: Session) {
+        val sessionViewHolder = holder as SessionViewHolder
+        sessionViewHolder.binding.session = item
+        sessionViewHolder.binding.mapView.tag = LatLng(52.3905217, 9.6996769)
+        sessionViewHolder.setMapLocation(item)
     }
 
-    class SessionViewHolder constructor(binding: ItemSessionBinding) :
-            DataBoundViewHolder<ItemSessionBinding>(binding), OnMapReadyCallback {
+    class SessionViewHolder constructor(binding: SessionItemBinding) :
+            DataBoundViewHolder<SessionItemBinding>(binding), OnMapReadyCallback {
         var googleMap: GoogleMap? = null
         override fun onMapReady(map: GoogleMap?) {
             MapsInitializer.initialize(binding.root.context)
@@ -77,9 +83,36 @@ class SessionAdapter(private val context: Context, appExecutors: AppExecutors,
             googleMap?.uiSettings?.isZoomControlsEnabled = false
             googleMap?.uiSettings?.setAllGesturesEnabled(false)
 
-            val camera = CameraUpdateFactory.newLatLngZoom(LatLng(52.3905217, 9.6996769), 14.0f)
-            googleMap?.moveCamera(camera)
-            googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL;
+            setMapLocation(null)
+        }
+
+        fun setMapLocation(session: Session?) {
+            if (googleMap == null) {
+                return
+            }
+
+            val options = PolylineOptions()
+
+            options.width(5f)
+            options.visible(true)
+            options.color(Color.parseColor("#CC0000FF"))
+            val locations = ArrayList<LatLng>()
+            locations.add(LatLng(10.8269675, 106.7057734))
+            locations.add(LatLng(10.8269675, 106.7057734))
+            locations.add(LatLng(10.8258295, 106.6920834))
+            locations.add(LatLng(10.8299814, 106.6844766))
+
+            for (item in locations) {
+                options.add(LatLng(item.latitude,
+                        item.longitude))
+            }
+
+            googleMap?.addPolyline(options)
+
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.8269675, 106.7057734), 14f))
+
+            // Set the map type back to normal.
+            googleMap?.setMapType(GoogleMap.MAP_TYPE_NORMAL)
         }
     }
 }

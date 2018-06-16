@@ -6,7 +6,7 @@ import io.objectbox.BoxStore
 import io.objectbox.android.ObjectBoxLiveData
 import javax.inject.Inject
 
-class SessionDao @Inject constructor(val boxStore: BoxStore) {
+class SessionDao @Inject constructor(boxStore: BoxStore) {
     private val box: Box<Session> = boxStore.boxFor(Session::class.java)
 
     fun add(session: Session) {
