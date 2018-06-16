@@ -25,6 +25,10 @@ fun convertBooleanToVisibility(b: Boolean): Int {
 
 @BindingAdapter("textDate")
 fun TextView.setDate(date: Date?) {
+    if(date == null) {
+        return
+    }
+
     try {
         val simpleDateFormat = SimpleDateFormat("hh:mm:ss", Locale.US)
         text = simpleDateFormat.format(date)

@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 import ductranit.me.trackme.R
 import ductranit.me.trackme.databinding.ActivityTrackingBinding
+import ductranit.me.trackme.services.LocationService
 import ductranit.me.trackme.ui.base.views.BaseActivity
 import ductranit.me.trackme.ui.tracking.State
 import ductranit.me.trackme.ui.tracking.viewmodels.TrackingViewModel
@@ -34,17 +35,18 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         }
 
         viewModel.sessionId = intent.getLongExtra(SESSION_ID, INVALID_ID)
-        viewModel.getSession().observe(this, Observer { session ->
-            binding.layoutTracking?.session = session
-            binding.executePendingBindings()
-        })
-
         viewModel.state.observe(this, Observer { updateState() })
         if (viewModel.sessionId != INVALID_ID) {
             viewModel.state.value = State.STOP
         } else {
             viewModel.state.value = State.PLAYING
+            LocationService.start(this)
         }
+
+        viewModel.getSession().observe(this, Observer { session ->
+            binding.layoutTracking?.session = session
+            binding.executePendingBindings()
+        })
 
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)

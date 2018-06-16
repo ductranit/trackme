@@ -59,4 +59,9 @@ object Deps {
             "com.google.dagger:dagger-android-processor:${Version.dagger2}"
             , "com.google.dagger:dagger-compiler:${Version.dagger2}"
     )
+
+    val playServices = arrayOf(
+            "com.google.android.gms:play-services-maps:${Version.playService}"
+            ,"com.google.android.gms:play-services-location:${Version.playService}"
+    )
 }

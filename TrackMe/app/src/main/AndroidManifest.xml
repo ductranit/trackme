@@ -20,8 +20,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".ui.main.views.MainActivity">
+        <activity android:name=".ui.main.views.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,7 +28,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.tracking.views.TrackingActivity"/>
+        <activity android:name=".ui.tracking.views.TrackingActivity" />
+
+        <service android:name=".services.LocationService" />
     </application>
 
 </manifest>

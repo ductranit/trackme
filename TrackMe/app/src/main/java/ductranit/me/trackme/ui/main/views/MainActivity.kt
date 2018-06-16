@@ -26,7 +26,6 @@ import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
 import kotlinx.android.synthetic.main.partial_app_bar.view.*
 import javax.inject.Inject
-import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import timber.log.Timber
 
 

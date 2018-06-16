@@ -47,6 +47,8 @@ dependencies {
     implementation Deps.dagger2
     kapt Deps.dagger2Annotation
 
+    implementation Deps.playServices
+
     implementation "com.google.code.gson:gson:$Version.gson"
 
     implementation "com.github.bumptech.glide:glide:$Version.glide"
@@ -63,8 +65,6 @@ dependencies {
 
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$Version.leakCanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$Version.leakCanary"
-
-    implementation "com.google.android.gms:play-services-maps:$Version.playService"
 
     // testing
     testImplementation "junit:junit:$Version.junit"

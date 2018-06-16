@@ -24,6 +24,7 @@ import dagger.android.support.AndroidSupportInjectionModule
 import ductranit.me.trackme.GlobalApp
 import ductranit.me.trackme.di.modules.ActivityModule
 import ductranit.me.trackme.di.modules.AppModule
+import ductranit.me.trackme.di.modules.ServiceModule
 import javax.inject.Singleton
 
 @Singleton
@@ -32,7 +33,8 @@ import javax.inject.Singleton
             AndroidInjectionModule::class,
             AndroidSupportInjectionModule::class,
             AppModule::class,
-            ActivityModule::class]
+            ActivityModule::class,
+            ServiceModule::class]
 )
 interface AppComponent {
     @Component.Builder
