@@ -41,14 +41,15 @@ fun TextView.setDate(date: Date?) {
 @BindingAdapter("textDistance")
 fun TextView.setDistance(distance: Double?) {
     if(distance != null) {
-        val km  = distance / 1000
+        val km  = distance / 1000 // convert from m to km
         text = context.getString(R.string.distance_text).format(km)
     }
 }
 
 @BindingAdapter("textSpeed")
-fun TextView.setSpeed(speed: Int?) {
+fun TextView.setSpeed(speed: Float?) {
     if(speed != null) {
-        text = context.getString(R.string.speed_text).format(speed)
+        val kmh = speed * (3600/1000) // convert from m/s to km/h
+        text = context.getString(R.string.speed_text).format(kmh)
     }
 }

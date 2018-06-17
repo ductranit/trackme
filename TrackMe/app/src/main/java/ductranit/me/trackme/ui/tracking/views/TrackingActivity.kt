@@ -1,6 +1,8 @@
 package ductranit.me.trackme.ui.tracking.views
 
 import android.arch.lifecycle.Observer
+import android.content.*
+import android.location.Location
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.view.MenuItem
@@ -17,14 +19,22 @@ import ductranit.me.trackme.services.LocationService
 import ductranit.me.trackme.ui.base.views.BaseActivity
 import ductranit.me.trackme.ui.tracking.State
 import ductranit.me.trackme.ui.tracking.viewmodels.TrackingViewModel
-import ductranit.me.trackme.utils.Constants.Companion.MARKER_CIRCLE_RADIUS
+import ductranit.me.trackme.utils.Constants
+import ductranit.me.trackme.utils.Constants.Companion.ACTION_BROADCAST
+import ductranit.me.trackme.utils.Constants.Companion.EXTRA_LOCATION
 import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
-import ductranit.me.trackme.utils.Constants.Companion.MAP_ZOOM_LEVEL
+import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LATITUDE
+import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LONGITUDE
+import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_SPEED
+import ductranit.me.trackme.utils.Constants.Companion.MARKER_CIRCLE_RADIUS
 import ductranit.me.trackme.utils.Constants.Companion.SESSION_ID
+import ductranit.me.trackme.utils.converters.setSpeed
+import ductranit.me.trackme.utils.getDouble
 import kotlinx.android.synthetic.main.activity_tracking.*
 import kotlinx.android.synthetic.main.content_tracking.*
 import kotlinx.android.synthetic.main.partial_app_bar.view.*
 import timber.log.Timber
+import javax.inject.Inject
 
 class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel>(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
@@ -32,6 +42,9 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     private var options: PolylineOptions? = null
     private var firstPositionMarker: Marker? = null
     private var currentPositionCircle: Circle? = null
+    private var locationReceiver: LocationReceiver? = null
+    @Inject
+    lateinit var preferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +92,14 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         options?.color(ContextCompat.getColor(this, R.color.colorMapPath))
 
         polyLines = googleMap?.addPolyline(options)
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.8269675, 106.7057734), MAP_ZOOM_LEVEL))
+        if (preferences.getDouble(KEY_LOCATION_LATITUDE, 0.0) != 0.0
+                && preferences.getDouble(KEY_LOCATION_LONGITUDE, 0.0) != 0.0) {
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(preferences.getDouble(KEY_LOCATION_LATITUDE,
+                    0.0), preferences.getDouble(KEY_LOCATION_LONGITUDE, 0.0)),
+                    Constants.MAP_ZOOM_LEVEL))
+        }
+
+        updateSpeed(preferences.getFloat(KEY_LOCATION_SPEED, 0.0f))
     }
 
     override fun onResume() {
@@ -95,11 +115,13 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     override fun onStop() {
         super.onStop()
         mapView.onStop()
+        unregisterReceiver()
     }
 
     override fun onStart() {
         super.onStart()
         mapView.onStart()
+        registerReceiver()
     }
 
     override fun onDestroy() {
@@ -164,7 +186,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                     .position(LatLng(locations[0].lat, locations[0].lng)))
 
             // draw current location as circle
-            if(locations.size >= 2) {
+            if (locations.size >= 2) {
                 currentPositionCircle?.remove()
                 val lastLocation = locations[locations.size - 1]
                 currentPositionCircle = googleMap?.addCircle(CircleOptions()
@@ -173,8 +195,37 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                         .strokeColor(ContextCompat.getColor(this, R.color.colorCircleRadius))
                         .fillColor(ContextCompat.getColor(this, R.color.colorMapPath)))
             }
+
+            val lastLocation = locations[locations.size - 1]
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lastLocation.lat, lastLocation.lng),
+                    Constants.MAP_ZOOM_LEVEL))
         }
 
         polyLines = googleMap?.addPolyline(options)
+    }
+
+    fun updateSpeed(speed: Float?) {
+        tvSpeed.setSpeed(speed)
+    }
+
+    private fun registerReceiver() {
+        if (locationReceiver == null) {
+            locationReceiver = LocationReceiver()
+        }
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(ACTION_BROADCAST)
+        registerReceiver(locationReceiver, intentFilter)
+    }
+
+    private fun unregisterReceiver() {
+        unregisterReceiver(locationReceiver)
+    }
+
+    inner class LocationReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val location = intent?.getSerializableExtra(EXTRA_LOCATION) as Location?
+            updateSpeed(location?.speed)
+        }
     }
 }

@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/item_pad"
-            android:text="@{Double.toString(session.distance)}"
+            app:textDistance="@{session.distance}"
             app:layout_constraintBottom_toTopOf="@+id/tvDistanceTitle"
             app:layout_constraintEnd_toStartOf="@+id/guideline1"
             app:layout_constraintStart_toStartOf="parent"
@@ -53,26 +53,25 @@
             app:layout_constraintGuide_percent="0.3" />
 
         <TextView
-            android:id="@+id/tvAvgSpeed"
+            android:id="@+id/tvSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/item_pad"
-            android:text="@{Integer.toString(session.averageSpeed)}"
-            app:layout_constraintBottom_toTopOf="@+id/tvAvgSpeedTitle"
+            app:layout_constraintBottom_toTopOf="@+id/tvSpeedTitle"
             app:layout_constraintEnd_toStartOf="@+id/guideline2"
             app:layout_constraintStart_toEndOf="@id/guideline1"
             tools:text="11 km/h" />
 
         <TextView
-            android:id="@+id/tvAvgSpeedTitle"
+            android:id="@+id/tvSpeedTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/item_pad"
-            android:text="@string/avg_speed"
+            android:text="@string/speed"
             app:layout_constraintBottom_toTopOf="@+id/layoutBottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline2"
             app:layout_constraintStart_toEndOf="@id/guideline1"
-            app:layout_constraintTop_toBottomOf="@+id/tvAvgSpeed" />
+            app:layout_constraintTop_toBottomOf="@+id/tvSpeed" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline2"

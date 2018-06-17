@@ -6,34 +6,24 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
 import android.os.*
-import android.support.annotation.NonNull
 import android.support.constraint.Constraints.TAG
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import ductranit.me.trackme.R
-import android.support.v4.content.LocalBroadcastManager
-import timber.log.Timber
 import android.support.v4.app.NotificationCompat
-import ductranit.me.trackme.ui.tracking.views.TrackingActivity
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
+import com.google.android.gms.location.*
 import dagger.android.AndroidInjection
-import ductranit.me.trackme.utils.Constants.Companion.ACTION_BROADCAST
-import ductranit.me.trackme.utils.Constants.Companion.LOCATION_CHANNEL_ID
-import ductranit.me.trackme.utils.Constants.Companion.EXTRA_LOCATION
+import ductranit.me.trackme.R
+import ductranit.me.trackme.ui.tracking.views.TrackingActivity
 import ductranit.me.trackme.utils.Constants.Companion.EXTRA_STARTED_FROM_NOTIFICATION
 import ductranit.me.trackme.utils.Constants.Companion.FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS
-import ductranit.me.trackme.utils.Constants.Companion.KEY_REQUESTING_LOCATION_UPDATES
-import ductranit.me.trackme.utils.Constants.Companion.NOTIFICATION_ID
-import ductranit.me.trackme.utils.Constants.Companion.UPDATE_INTERVAL_IN_MILLISECONDS
-import javax.inject.Inject
-import android.os.Looper
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LATITUDE
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LONGITUDE
+import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_SPEED
+import ductranit.me.trackme.utils.Constants.Companion.KEY_REQUESTING_LOCATION_UPDATES
+import ductranit.me.trackme.utils.Constants.Companion.LOCATION_CHANNEL_ID
+import ductranit.me.trackme.utils.Constants.Companion.NOTIFICATION_ID
+import ductranit.me.trackme.utils.Constants.Companion.UPDATE_INTERVAL_IN_MILLISECONDS
 import ductranit.me.trackme.utils.putDouble
+import timber.log.Timber
+import javax.inject.Inject
 
 
 class LocationService : Service() {
@@ -176,9 +166,10 @@ class LocationService : Service() {
     }
 
     private fun saveCurrentLocation() {
-        if(location != null) {
+        if (location != null) {
             sharedPreferences.edit().putDouble(KEY_LOCATION_LATITUDE, location!!.latitude).apply()
             sharedPreferences.edit().putDouble(KEY_LOCATION_LONGITUDE, location!!.longitude).apply()
+            sharedPreferences.edit().putFloat(KEY_LOCATION_SPEED, location!!.speed).apply()
         }
     }
 
@@ -186,10 +177,6 @@ class LocationService : Service() {
         this.location = location
 
         saveCurrentLocation()
-        // Notify anyone listening for broadcasts about the new location.
-        val intent = Intent(ACTION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, location)
-        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
 
         // Update notification content if running as a foreground service.
         if (serviceIsRunningInForeground(this)) {

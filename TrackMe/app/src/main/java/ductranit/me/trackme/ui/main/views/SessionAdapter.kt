@@ -95,7 +95,6 @@ class SessionAdapter(appExecutors: AppExecutors,
 
         fun setMapLocation(session: Session?) {
             if (googleMap == null) {
-                googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
                 return
             }
 

@@ -15,6 +15,7 @@ class Constants {
         const val KEY_REQUESTING_LOCATION_UPDATES = "KEY_REQUESTING_LOCATION_UPDATES"
         const val KEY_LOCATION_LATITUDE = "KEY_LOCATION_LATITUDE"
         const val KEY_LOCATION_LONGITUDE = "KEY_LOCATION_LONGITUDE"
+        const val KEY_LOCATION_SPEED = "KEY_LOCATION_SPEED"
 
         const val ACTION_BROADCAST = BuildConfig.APPLICATION_ID + "broadcast"
         const val EXTRA_LOCATION = BuildConfig.APPLICATION_ID + ".location"
