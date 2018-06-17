@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 /**
  * This file contains all versions of all dependencies and app configurations
  */

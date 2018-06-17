@@ -5,4 +5,5 @@
     <color name="colorAccent">#cc3300</color>
 
     <color name="colorMapPath">#CC0000FF</color>
+    <color name="colorCircleRadius">#ccddff</color>
 </resources>

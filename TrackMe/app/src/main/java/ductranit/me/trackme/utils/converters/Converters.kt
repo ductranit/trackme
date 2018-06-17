@@ -4,6 +4,7 @@ import android.databinding.BindingAdapter
 import android.databinding.BindingConversion
 import android.view.View
 import android.widget.TextView
+import ductranit.me.trackme.R
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,3 +38,17 @@ fun TextView.setDate(date: Date?) {
     }
 }
 
+@BindingAdapter("textDistance")
+fun TextView.setDistance(distance: Double?) {
+    if(distance != null) {
+        val km  = distance / 1000
+        text = context.getString(R.string.distance_text).format(km)
+    }
+}
+
+@BindingAdapter("textSpeed")
+fun TextView.setSpeed(speed: Int?) {
+    if(speed != null) {
+        text = context.getString(R.string.speed_text).format(speed)
+    }
+}

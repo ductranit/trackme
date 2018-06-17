@@ -9,9 +9,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import ductranit.me.trackme.R
 import ductranit.me.trackme.databinding.ActivityTrackingBinding
 import ductranit.me.trackme.models.HistoryLocation
@@ -19,6 +17,7 @@ import ductranit.me.trackme.services.LocationService
 import ductranit.me.trackme.ui.base.views.BaseActivity
 import ductranit.me.trackme.ui.tracking.State
 import ductranit.me.trackme.ui.tracking.viewmodels.TrackingViewModel
+import ductranit.me.trackme.utils.Constants.Companion.MARKER_CIRCLE_RADIUS
 import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
 import ductranit.me.trackme.utils.Constants.Companion.MAP_ZOOM_LEVEL
 import ductranit.me.trackme.utils.Constants.Companion.SESSION_ID
@@ -31,6 +30,9 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     private var googleMap: GoogleMap? = null
     private var polyLines: Polyline? = null
     private var options: PolylineOptions? = null
+    private var firstPositionMarker: Marker? = null
+    private var currentPositionCircle: Circle? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -148,9 +150,29 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         }
 
         polyLines?.remove()
-        for (location in locations) {
-            Timber.d("location $location")
-            options?.add(LatLng(location.lat, location.lng))
+
+
+        if (!locations.isEmpty()) {
+            for (location in locations) {
+                Timber.d("location $location")
+                options?.add(LatLng(location.lat, location.lng))
+            }
+
+            // draw first position as marker
+            firstPositionMarker?.remove()
+            firstPositionMarker = googleMap?.addMarker(MarkerOptions()
+                    .position(LatLng(locations[0].lat, locations[0].lng)))
+
+            // draw current location as circle
+            if(locations.size >= 2) {
+                currentPositionCircle?.remove()
+                val lastLocation = locations[locations.size - 1]
+                currentPositionCircle = googleMap?.addCircle(CircleOptions()
+                        .center(LatLng(lastLocation.lat, lastLocation.lng))
+                        .radius(MARKER_CIRCLE_RADIUS)
+                        .strokeColor(ContextCompat.getColor(this, R.color.colorCircleRadius))
+                        .fillColor(ContextCompat.getColor(this, R.color.colorMapPath)))
+            }
         }
 
         polyLines = googleMap?.addPolyline(options)

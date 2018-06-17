@@ -10,8 +10,8 @@ import java.util.*
 class Session {
     @Id
     var id: Long = 0
-    var distance: Int = 0
-    var averageSpeed: Int = 0
+    var distance: Double = 0.0 // in meter
+    var averageSpeed: Int = 0 // km/h
     var startTime: Date? = null
     var endTime: Date? = null
 

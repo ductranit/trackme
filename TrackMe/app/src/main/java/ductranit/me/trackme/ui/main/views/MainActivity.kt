@@ -17,6 +17,7 @@ import ductranit.me.trackme.ui.tracking.views.TrackingActivity
 import ductranit.me.trackme.ui.widgets.VerticalSpaceItemDecoration
 import ductranit.me.trackme.utils.AppExecutors
 import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
+import ductranit.me.trackme.utils.Constants.Companion.PERMISSIONS_REQUEST
 import ductranit.me.trackme.utils.Constants.Companion.SESSION_ID
 import ductranit.me.trackme.utils.PermissionUtil
 import kotlinx.android.synthetic.main.activity_main.*
@@ -26,7 +27,6 @@ import kotlinx.android.synthetic.main.partial_app_bar.view.*
 import javax.inject.Inject
 
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), PermissionUtil.PermissionAskListener {
-    private val PERMISSIONS_REQUEST = 1
     private lateinit var adapter: SessionAdapter
     private var sessionId: Long = INVALID_ID
 

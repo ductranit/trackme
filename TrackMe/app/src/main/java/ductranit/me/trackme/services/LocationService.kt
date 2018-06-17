@@ -31,6 +31,9 @@ import ductranit.me.trackme.utils.Constants.Companion.NOTIFICATION_ID
 import ductranit.me.trackme.utils.Constants.Companion.UPDATE_INTERVAL_IN_MILLISECONDS
 import javax.inject.Inject
 import android.os.Looper
+import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LATITUDE
+import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LONGITUDE
+import ductranit.me.trackme.utils.putDouble
 
 
 class LocationService : Service() {
@@ -158,26 +161,31 @@ class LocationService : Service() {
 
     private fun getLastLocation() {
         try {
-            fusedLocationClient?.lastLocation?.addOnCompleteListener(object : OnCompleteListener<Location> {
-                override fun onComplete(@NonNull task: Task<Location>) {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        location = task.getResult()
-                    } else {
-                        Timber.w("Failed to get location.")
-                    }
+            fusedLocationClient?.lastLocation?.addOnCompleteListener { task ->
+                if (task.isSuccessful && task.result != null) {
+                    location = task.result
+                    saveCurrentLocation()
+                } else {
+                    Timber.w("Failed to get location.")
                 }
-            })
+            }
         } catch (unlikely: SecurityException) {
             Timber.e("Lost location permission.$unlikely")
         }
 
     }
 
-    private fun onNewLocation(location: Location) {
-        Timber.i("New location: $location")
+    private fun saveCurrentLocation() {
+        if(location != null) {
+            sharedPreferences.edit().putDouble(KEY_LOCATION_LATITUDE, location!!.latitude).apply()
+            sharedPreferences.edit().putDouble(KEY_LOCATION_LONGITUDE, location!!.longitude).apply()
+        }
+    }
 
+    private fun onNewLocation(location: Location) {
         this.location = location
 
+        saveCurrentLocation()
         // Notify anyone listening for broadcasts about the new location.
         val intent = Intent(ACTION_BROADCAST)
         intent.putExtra(EXTRA_LOCATION, location)
