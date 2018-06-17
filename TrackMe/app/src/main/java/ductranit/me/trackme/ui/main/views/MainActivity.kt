@@ -11,8 +11,10 @@ import android.widget.Toast
 import com.google.android.gms.maps.GoogleMap
 import ductranit.me.trackme.R
 import ductranit.me.trackme.databinding.ActivityMainBinding
+import ductranit.me.trackme.models.SessionDataManager
 import ductranit.me.trackme.ui.base.views.BaseActivity
 import ductranit.me.trackme.ui.main.viewmodels.MainViewModel
+import ductranit.me.trackme.ui.tracking.State
 import ductranit.me.trackme.ui.tracking.views.TrackingActivity
 import ductranit.me.trackme.ui.widgets.VerticalSpaceItemDecoration
 import ductranit.me.trackme.utils.AppExecutors
@@ -35,6 +37,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
 
     @Inject
     lateinit var permissionUtil: PermissionUtil
+
+    @Inject
+    lateinit var sessionDataManager: SessionDataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,7 +134,12 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
 
     override fun onPermissionGranted() {
         val intent = Intent(getActivity(), TrackingActivity::class.java)
-        intent.putExtra(SESSION_ID, sessionId)
+        sessionDataManager.sessionId = sessionId
+        if(sessionId == INVALID_ID) {
+            sessionDataManager.state = State.PLAYING
+        } else {
+            sessionDataManager.state = State.DEFAULT
+        }
         startActivity(intent)
     }
 

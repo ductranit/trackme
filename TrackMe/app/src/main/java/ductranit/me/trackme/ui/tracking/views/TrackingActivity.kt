@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.content.*
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.view.MenuItem
 import android.view.View
@@ -15,25 +16,29 @@ import com.google.android.gms.maps.model.*
 import ductranit.me.trackme.R
 import ductranit.me.trackme.databinding.ActivityTrackingBinding
 import ductranit.me.trackme.models.HistoryLocation
+import ductranit.me.trackme.models.SessionDataManager
 import ductranit.me.trackme.services.LocationService
 import ductranit.me.trackme.ui.base.views.BaseActivity
 import ductranit.me.trackme.ui.tracking.State
 import ductranit.me.trackme.ui.tracking.viewmodels.TrackingViewModel
-import ductranit.me.trackme.utils.Constants
 import ductranit.me.trackme.utils.Constants.Companion.ACTION_BROADCAST
 import ductranit.me.trackme.utils.Constants.Companion.EXTRA_LOCATION
 import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LATITUDE
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LONGITUDE
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_SPEED
+import ductranit.me.trackme.utils.Constants.Companion.MAP_ZOOM_LEVEL
 import ductranit.me.trackme.utils.Constants.Companion.MARKER_CIRCLE_RADIUS
-import ductranit.me.trackme.utils.Constants.Companion.SESSION_ID
+import ductranit.me.trackme.utils.Constants.Companion.TIMER_TICK
+import ductranit.me.trackme.utils.converters.setDate
+import ductranit.me.trackme.utils.converters.setDateRange
 import ductranit.me.trackme.utils.converters.setSpeed
 import ductranit.me.trackme.utils.getDouble
 import kotlinx.android.synthetic.main.activity_tracking.*
 import kotlinx.android.synthetic.main.content_tracking.*
 import kotlinx.android.synthetic.main.partial_app_bar.view.*
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel>(), OnMapReadyCallback {
@@ -43,8 +48,15 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     private var firstPositionMarker: Marker? = null
     private var currentPositionCircle: Circle? = null
     private var locationReceiver: LocationReceiver? = null
+    private var handler: Handler = Handler()
+    private var timerRunnable: TimerRunnable = TimerRunnable()
+    private var startTime: Date? = null
+
     @Inject
     lateinit var preferences: SharedPreferences
+
+    @Inject
+    lateinit var sessionDataManager: SessionDataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,16 +67,19 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
             supportActionBar?.title = getString(R.string.record)
         }
 
-        viewModel.sessionId = intent.getLongExtra(SESSION_ID, INVALID_ID)
+        viewModel.sessionId = sessionDataManager.sessionId
+        viewModel.isRecording = sessionDataManager.sessionId == INVALID_ID
         viewModel.state.observe(this, Observer { updateState() })
-        if (viewModel.sessionId != INVALID_ID) {
-            viewModel.state.value = State.STOP
-        } else {
-            viewModel.state.value = State.PLAYING
-            LocationService.start(this)
-        }
+        viewModel.state.value = sessionDataManager.state
 
         viewModel.getSession().observe(this, Observer { session ->
+            if (viewModel.isRecording) {
+                startTime = session?.startTime
+                handler.post(timerRunnable)
+            } else {
+                tvTime.setDateRange(session?.startTime, session?.endTime)
+            }
+
             session?.locations?.let {
                 updateLocations(it)
             }
@@ -75,6 +90,21 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
 
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
+        btnPause.setOnClickListener {
+            viewModel.state.value = State.PAUSE
+            sessionDataManager.state = State.PAUSE
+        }
+
+        btnStop.setOnClickListener {
+            viewModel.state.value = State.STOP
+            sessionDataManager.state = State.STOP
+        }
+
+        btnReplay.setOnClickListener {
+            viewModel.state.value = State.PLAYING
+            sessionDataManager.state = State.PLAYING
+        }
     }
 
     override fun onMapReady(map: GoogleMap?) {
@@ -96,7 +126,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                 && preferences.getDouble(KEY_LOCATION_LONGITUDE, 0.0) != 0.0) {
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(preferences.getDouble(KEY_LOCATION_LATITUDE,
                     0.0), preferences.getDouble(KEY_LOCATION_LONGITUDE, 0.0)),
-                    Constants.MAP_ZOOM_LEVEL))
+                    MAP_ZOOM_LEVEL))
         }
 
         updateSpeed(preferences.getFloat(KEY_LOCATION_SPEED, 0.0f))
@@ -105,17 +135,21 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        if(viewModel.isRecording) {
+            handler.post(timerRunnable)
+        }
     }
 
     override fun onPause() {
-        super.onPause()
         mapView.onPause()
+        handler.removeCallbacks(timerRunnable)
+        super.onPause()
     }
 
     override fun onStop() {
-        super.onStop()
         mapView.onStop()
         unregisterReceiver()
+        super.onStop()
     }
 
     override fun onStart() {
@@ -125,8 +159,9 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         mapView.onDestroy()
+        handler.removeCallbacks(timerRunnable)
+        super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -152,15 +187,30 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                 btnPause.visibility = View.VISIBLE
                 btnReplay.visibility = View.GONE
                 btnStop.visibility = View.GONE
+                LocationService.start(this)
+
+                if(viewModel.isRecording) {
+                    handler.post(timerRunnable)
+                }
             }
 
             State.PAUSE -> {
                 btnPause.visibility = View.GONE
                 btnReplay.visibility = View.VISIBLE
                 btnStop.visibility = View.VISIBLE
+                LocationService.stop(this)
+                handler.removeCallbacks(timerRunnable)
             }
 
             State.STOP -> {
+                viewModel.stop()
+                handler.removeCallbacks(timerRunnable)
+                LocationService.stop(this)
+                sessionDataManager.clear()
+                finish()
+            }
+
+            State.DEFAULT -> {
                 layoutBottom.visibility = View.GONE
             }
         }
@@ -198,7 +248,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
 
             val lastLocation = locations[locations.size - 1]
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lastLocation.lat, lastLocation.lng),
-                    Constants.MAP_ZOOM_LEVEL))
+                    MAP_ZOOM_LEVEL))
         }
 
         polyLines = googleMap?.addPolyline(options)
@@ -226,6 +276,13 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         override fun onReceive(context: Context?, intent: Intent?) {
             val location = intent?.getSerializableExtra(EXTRA_LOCATION) as Location?
             updateSpeed(location?.speed)
+        }
+    }
+
+    inner class TimerRunnable : Runnable {
+        override fun run() {
+            tvTime.setDate(startTime)
+            handler.postDelayed(this, TIMER_TICK)
         }
     }
 }

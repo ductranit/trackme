@@ -8,10 +8,10 @@ import javax.inject.Singleton
 @Singleton
 class SessionDataManager @Inject constructor(){
     var sessionId: Long = INVALID_ID
-    var state: State = State.STOP
+    var state: State = State.DEFAULT
 
     fun clear(){
         sessionId = INVALID_ID
-        state = State.STOP
+        state = State.DEFAULT
     }
 }

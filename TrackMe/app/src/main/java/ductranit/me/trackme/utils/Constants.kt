@@ -10,6 +10,7 @@ class Constants {
         const val MAP_ZOOM_LEVEL = 15f
         const val MIN_DISTANCE = 2 // 2m
         const val MARKER_CIRCLE_RADIUS = 60.0
+        const val TIMER_TICK = 1000L
 
         // for location service
         const val KEY_REQUESTING_LOCATION_UPDATES = "KEY_REQUESTING_LOCATION_UPDATES"

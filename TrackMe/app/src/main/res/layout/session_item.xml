@@ -86,7 +86,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/guideline2"
             app:layout_constraintTop_toBottomOf="@+id/mapView"
-            app:textDate="@{session.startTime}"
+            app:textDateStart="@{session.startTime}"
+            app:textDateEnd="@{session.endTime}"
             tools:text="10:10:20" />
 
 

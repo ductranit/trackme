@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.TextView
 import ductranit.me.trackme.R
 import timber.log.Timber
-import java.text.SimpleDateFormat
 import java.util.*
 
 @BindingAdapter("visibleOrGone")
@@ -31,8 +30,29 @@ fun TextView.setDate(date: Date?) {
     }
 
     try {
-        val simpleDateFormat = SimpleDateFormat("hh:mm:ss", Locale.US)
-        text = simpleDateFormat.format(date)
+        val now = Date()
+        val diff = now.time - date.time
+        val diffSeconds = diff / 1000 % 60
+        val diffMinutes = diff / (60 * 1000) % 60
+        val diffHours = diff / (60 * 60 * 1000) % 23
+        text = String.format("%02d:%02d:%02d", diffHours, diffMinutes, diffSeconds)
+    } catch (throwable: Throwable) {
+        Timber.e(throwable)
+    }
+}
+
+@BindingAdapter("textDateStart", "textDateEnd")
+fun TextView.setDateRange(start: Date?, end: Date?) {
+    if(start == null || end == null) {
+        return
+    }
+
+    try {
+        val diff = end.time - start.time
+        val diffSeconds = diff / 1000 % 60
+        val diffMinutes = diff / (60 * 1000) % 60
+        val diffHours = diff / (60 * 60 * 1000) % 23
+        text = String.format("%02d:%02d:%02d", diffHours, diffMinutes, diffSeconds)
     } catch (throwable: Throwable) {
         Timber.e(throwable)
     }
