@@ -37,6 +37,9 @@ class LocationService : Service() {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
+    @Inject
+    lateinit var locationHandler: LocationHandler
+
     private var notificationManager: NotificationManager? = null
 
     /**
@@ -184,6 +187,8 @@ class LocationService : Service() {
         if (serviceIsRunningInForeground(this)) {
             notificationManager?.notify(NOTIFICATION_ID, getNotification())
         }
+
+        locationHandler.locationUpdating(location)
     }
 
     /**

@@ -11,6 +11,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import ductranit.me.trackme.R
 import ductranit.me.trackme.databinding.SessionItemBinding
@@ -18,6 +19,7 @@ import ductranit.me.trackme.models.Session
 import ductranit.me.trackme.ui.widgets.DataBoundListAdapter
 import ductranit.me.trackme.ui.widgets.DataBoundViewHolder
 import ductranit.me.trackme.utils.AppExecutors
+import ductranit.me.trackme.utils.Constants.Companion.MAP_ZOOM_LEVEL
 
 class SessionAdapter(appExecutors: AppExecutors,
                      private val itemClickCallback: ((Session) -> Unit)?) :
@@ -73,6 +75,11 @@ class SessionAdapter(appExecutors: AppExecutors,
     class SessionViewHolder constructor(binding: SessionItemBinding) :
             DataBoundViewHolder<SessionItemBinding>(binding), OnMapReadyCallback {
         var googleMap: GoogleMap? = null
+        var options: PolylineOptions = PolylineOptions().visible(true).
+                width(5f).color(ContextCompat.getColor(binding.root.context,
+                R.color.colorMapPath))
+        var polyLines: Polyline? = null
+
         override fun onMapReady(map: GoogleMap?) {
             MapsInitializer.initialize(binding.root.context)
             googleMap = map
@@ -82,36 +89,28 @@ class SessionAdapter(appExecutors: AppExecutors,
             googleMap?.uiSettings?.isZoomControlsEnabled = false
             googleMap?.uiSettings?.setAllGesturesEnabled(false)
 
-            setMapLocation(null)
+            setMapLocation(binding.session)
         }
 
         fun setMapLocation(session: Session?) {
             if (googleMap == null) {
+                googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
                 return
             }
 
-            val options = PolylineOptions()
+            if (session != null && !session.locations.isEmpty()) {
+                for (item in session.locations) {
+                    options.add(LatLng(item.lat,
+                            item.lng))
+                }
 
-            options.width(5f)
-            options.visible(true)
-            options.color(ContextCompat.getColor(binding.root.context, R.color.colorMapPath))
-            val locations = ArrayList<LatLng>()
-            locations.add(LatLng(10.8269675, 106.7057734))
-            locations.add(LatLng(10.8269675, 106.7057734))
-            locations.add(LatLng(10.8258295, 106.6920834))
-            locations.add(LatLng(10.8299814, 106.6844766))
-
-            for (item in locations) {
-                options.add(LatLng(item.latitude,
-                        item.longitude))
+                polyLines?.remove()
+                polyLines = googleMap?.addPolyline(options)
+                val lastItem = session.locations[session.locations.size - 1]
+                googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lastItem.lat, lastItem.lng), MAP_ZOOM_LEVEL))
             }
 
-            googleMap?.addPolyline(options)
-
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.8269675, 106.7057734), 14f))
-
-            // Set the map type back to normal.
-            googleMap?.setMapType(GoogleMap.MAP_TYPE_NORMAL)
+            googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
         }
     }
 }

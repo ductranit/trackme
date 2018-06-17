@@ -7,6 +7,7 @@ class Constants {
         const val SHARE_PREF_NAME = "TrackMe_prefs"
         const val SESSION_ID = "SESSION_ID"
         const val INVALID_ID = Long.MIN_VALUE
+        const val MAP_ZOOM_LEVEL = 15f
 
         // for location service
         const val KEY_REQUESTING_LOCATION_UPDATES = "KEY_REQUESTING_LOCATION_UPDATES"

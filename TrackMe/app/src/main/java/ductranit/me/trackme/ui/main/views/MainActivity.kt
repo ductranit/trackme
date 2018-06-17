@@ -2,11 +2,8 @@ package ductranit.me.trackme.ui.main.views
 
 import android.Manifest
 import android.arch.lifecycle.Observer
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v7.widget.RecyclerView
 import android.widget.Toast
@@ -26,10 +23,8 @@ import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
 import kotlinx.android.synthetic.main.partial_app_bar.view.*
 import javax.inject.Inject
-import timber.log.Timber
 
-
-class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
+class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), PermissionUtil.PermissionAskListener {
     private val PERMISSIONS_REQUEST = 1
     private lateinit var adapter: SessionAdapter
     private var sessionId: Long = INVALID_ID
@@ -59,7 +54,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         }
 
         rvSession.adapter = adapter
-        rvSession.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimension(R.dimen.item_pad).toInt()))
+        val itemSpace = resources.getDimension(R.dimen.item_pad).toInt()
+        val lastSpace = resources.getDimension(R.dimen.last_item_space).toInt()
+        rvSession.addItemDecoration(VerticalSpaceItemDecoration(itemSpace, lastSpace))
 
         lifecycle.addObserver(adapter)
 
@@ -95,41 +92,40 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         return R.layout.activity_main
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == PERMISSIONS_REQUEST) {
+            if (permissionUtil.hasGrant(grantResults)) {
+                goToTracking(sessionId)
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
+    override fun onNeedPermission() {
+        ActivityCompat.requestPermissions(getActivity(),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSIONS_REQUEST)
+    }
+
+    override fun onPermissionPreviouslyDenied() {
+        Toast.makeText(getActivity(), R.string.msg_location_permission, Toast.LENGTH_LONG).show()
+        onNeedPermission()
+    }
+
+    override fun onPermissionDisabled() {
+        Toast.makeText(getActivity(), R.string.msg_location_permission_disable, Toast.LENGTH_LONG).show()
+        permissionUtil.goToAppSetting(this)
+    }
+
+    override fun onPermissionGranted() {
+        val intent = Intent(getActivity(), TrackingActivity::class.java)
+        intent.putExtra(SESSION_ID, sessionId)
+        startActivity(intent)
+    }
+
     private fun goToTracking(sessionId: Long) {
         this.sessionId = sessionId
-        permissionUtil.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION,
-                object : PermissionUtil.PermissionAskListener {
-                    override fun onNeedPermission() {
-                        ActivityCompat.requestPermissions(getActivity(),
-                                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                                PERMISSIONS_REQUEST)
-                    }
-
-                    override fun onPermissionPreviouslyDenied() {
-                        Toast.makeText(getActivity(), R.string.msg_location_permission, Toast.LENGTH_LONG).show()
-                        onNeedPermission()
-                    }
-
-                    override fun onPermissionDisabled() {
-                        Toast.makeText(getActivity(), R.string.msg_location_permission_disable, Toast.LENGTH_LONG).show()
-
-                        try {
-                            val intent = Intent()
-                            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                            val uri = Uri.fromParts("package", packageName, null)
-                            intent.data = uri
-                            startActivity(intent)
-                        } catch (ex: ActivityNotFoundException) {
-                            Timber.e(ex)
-                        }
-                    }
-
-                    override fun onPermissionGranted() {
-                        val intent = Intent(getActivity(), TrackingActivity::class.java)
-                        intent.putExtra(SESSION_ID, sessionId)
-                        startActivity(intent)
-                    }
-
-                })
+        permissionUtil.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION, this)
     }
 }

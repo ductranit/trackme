@@ -10,21 +10,27 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import ductranit.me.trackme.R
 import ductranit.me.trackme.databinding.ActivityTrackingBinding
+import ductranit.me.trackme.models.HistoryLocation
 import ductranit.me.trackme.services.LocationService
 import ductranit.me.trackme.ui.base.views.BaseActivity
 import ductranit.me.trackme.ui.tracking.State
 import ductranit.me.trackme.ui.tracking.viewmodels.TrackingViewModel
 import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
+import ductranit.me.trackme.utils.Constants.Companion.MAP_ZOOM_LEVEL
 import ductranit.me.trackme.utils.Constants.Companion.SESSION_ID
 import kotlinx.android.synthetic.main.activity_tracking.*
 import kotlinx.android.synthetic.main.content_tracking.*
 import kotlinx.android.synthetic.main.partial_app_bar.view.*
+import timber.log.Timber
 
 class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel>(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
+    private var polyLines: Polyline? = null
+    private var options: PolylineOptions? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,6 +50,10 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         }
 
         viewModel.getSession().observe(this, Observer { session ->
+            session?.locations?.let {
+                updateLocations(it)
+            }
+
             binding.layoutTracking?.session = session
             binding.executePendingBindings()
         })
@@ -61,24 +71,13 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         googleMap?.uiSettings?.isZoomControlsEnabled = true
         googleMap?.uiSettings?.setAllGesturesEnabled(true)
 
-        val options = PolylineOptions()
+        options = PolylineOptions()
+        options?.width(5f)
+        options?.visible(true)
+        options?.color(ContextCompat.getColor(this, R.color.colorMapPath))
 
-        options.width(5f)
-        options.visible(true)
-        options.color(ContextCompat.getColor(this, R.color.colorMapPath))
-        val locations = ArrayList<LatLng>()
-        locations.add(LatLng(10.8269675, 106.7057734))
-        locations.add(LatLng(10.8269675, 106.7057734))
-        locations.add(LatLng(10.8258295, 106.6920834))
-        locations.add(LatLng(10.8299814, 106.6844766))
-
-        for (item in locations) {
-            options.add(LatLng(item.latitude,
-                    item.longitude))
-        }
-
-        googleMap?.addPolyline(options)
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.8269675, 106.7057734), 16f))
+        polyLines = googleMap?.addPolyline(options)
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.8269675, 106.7057734), MAP_ZOOM_LEVEL))
     }
 
     override fun onResume() {
@@ -143,4 +142,17 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         }
     }
 
+    private fun updateLocations(locations: MutableList<HistoryLocation>) {
+        if (googleMap == null || options == null) {
+            return
+        }
+
+        polyLines?.remove()
+        for (location in locations) {
+            Timber.d("location $location")
+            options?.add(LatLng(location.lat, location.lng))
+        }
+
+        polyLines = googleMap?.addPolyline(options)
+    }
 }

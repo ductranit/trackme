@@ -1,10 +1,15 @@
 package ductranit.me.trackme.utils
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.support.v4.app.ActivityCompat
+import timber.log.Timber
 import javax.inject.Inject
 
 class PermissionUtil @Inject constructor(private val sharePref: SharedPreferences) {
@@ -35,6 +40,32 @@ class PermissionUtil @Inject constructor(private val sharePref: SharedPreference
         } else {
             listener.onPermissionGranted()
         }
+    }
+
+    fun goToAppSetting(activity: Activity) {
+        try {
+            val intent = Intent()
+            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            val uri = Uri.fromParts("package", activity.packageName, null)
+            intent.data = uri
+            activity.startActivity(intent)
+        } catch (ex: ActivityNotFoundException) {
+            Timber.e(ex)
+        }
+    }
+
+    private fun hasGranted(grantResult: Int): Boolean {
+        return grantResult == PackageManager.PERMISSION_GRANTED
+    }
+
+    fun hasGrant(grantResults: IntArray): Boolean {
+        for (result in grantResults) {
+            if (!hasGranted(result)) {
+                return false
+            }
+        }
+
+        return true
     }
 
     /*

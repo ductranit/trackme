@@ -1,10 +1,10 @@
 package ductranit.me.trackme.models
 
-import io.objectbox.annotation.Backlink
+import ductranit.me.trackme.db.LocationConverter
+import io.objectbox.annotation.Convert
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
-import io.objectbox.relation.ToMany
-import java.util.Date
+import java.util.*
 
 @Entity
 class Session {
@@ -14,6 +14,7 @@ class Session {
     var averageSpeed: Int = 0
     var startTime: Date? = null
     var endTime: Date? = null
-    @Backlink
-    var locations: ToMany<HistoryLocation>? = null
+
+    @Convert(converter = LocationConverter::class, dbType = String::class)
+    var locations: MutableList<HistoryLocation> = mutableListOf()
 }

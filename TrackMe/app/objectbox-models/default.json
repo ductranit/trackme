@@ -4,37 +4,8 @@
   "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
   "entities": [
     {
-      "id": "2:4098948257856106980",
-      "lastPropertyId": "5:7073931684763128742",
-      "name": "HistoryLocation",
-      "properties": [
-        {
-          "id": "1:6777217179666326308",
-          "name": "id"
-        },
-        {
-          "id": "2:3450720975299117532",
-          "name": "lat"
-        },
-        {
-          "id": "3:7878808626985707077",
-          "name": "lng"
-        },
-        {
-          "id": "4:2182977761024419294",
-          "name": "time"
-        },
-        {
-          "id": "5:7073931684763128742",
-          "indexId": "1:1886058441461923229",
-          "name": "sessionId"
-        }
-      ],
-      "relations": []
-    },
-    {
       "id": "3:6254777768267476052",
-      "lastPropertyId": "5:1328038742549613716",
+      "lastPropertyId": "6:4660362951629347573",
       "name": "Session",
       "properties": [
         {
@@ -56,6 +27,10 @@
         {
           "id": "5:1328038742549613716",
           "name": "endTime"
+        },
+        {
+          "id": "6:4660362951629347573",
+          "name": "locations"
         }
       ],
       "relations": []
@@ -68,11 +43,19 @@
   "modelVersion": 4,
   "modelVersionParserMinimum": 4,
   "retiredEntityUids": [
-    3305364017071763717
+    3305364017071763717,
+    4098948257856106980
   ],
-  "retiredIndexUids": [],
+  "retiredIndexUids": [
+    1886058441461923229
+  ],
   "retiredPropertyUids": [
-    7335230850067145899
+    7335230850067145899,
+    6777217179666326308,
+    3450720975299117532,
+    7878808626985707077,
+    2182977761024419294,
+    7073931684763128742
   ],
   "retiredRelationUids": [],
   "version": 1

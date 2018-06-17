@@ -23,7 +23,11 @@ class SessionDao @Inject constructor(boxStore: BoxStore) {
         return box[id] != null
     }
 
-    fun getSession(id: Long): ObjectBoxSingLiveData<Session> {
+    fun getSession(id: Long): Session {
+        return box[id]
+    }
+
+    fun getSessionLiveData(id: Long): ObjectBoxSingLiveData<Session> {
         val builder = box.query()
         builder.equal(Session_.__ID_PROPERTY, id)
         return ObjectBoxSingLiveData(builder.build())
