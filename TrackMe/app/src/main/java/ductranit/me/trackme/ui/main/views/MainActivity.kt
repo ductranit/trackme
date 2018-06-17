@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.widget.Toast
 import com.google.android.gms.maps.GoogleMap
 import ductranit.me.trackme.R
@@ -67,10 +68,18 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
             }
         }
 
-        viewModel.getSessions().observe(this, Observer { sessions ->
-            adapter.submitList(sessions)
-            binding.executePendingBindings()
+        viewModel.isLoaded.observe(this, Observer { loaded ->
+            if (loaded == true) {
+                viewModel.getSessions().observe(this, Observer { sessions ->
+                    progressLoading.visibility = View.GONE
+                    adapter.submitList(sessions)
+                    binding.executePendingBindings()
+                })
+            } else {
+                progressLoading.visibility = View.VISIBLE
+            }
         })
+
 
         rvSession.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
