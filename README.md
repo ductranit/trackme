@@ -1,10 +1,15 @@
-# trackme
-A work out tracking android application
+# TrackMe
+> ***A workout tracking android application***
+
+<img src="/logo.png" width="80">
 
 # Screenshots
 
 ![Screenshot1](https://raw.githubusercontent.com/ductranit/trackme/master/Screenshots/screenshot1.png)
 ![Screenshot3](https://raw.githubusercontent.com/ductranit/trackme/master/Screenshots/screenshot3.png)
+
+# Demo
+[Download demo apk here](https://github.com/ductranit/trackme/blob/master/Demo/TrackMe.apk?raw=true)
 
 # Features
 - Recording work out session: route, speed, distance & time
@@ -18,7 +23,7 @@ Follow [Android Architecture Components sample](https://github.com/googlesamples
 # Project structure
 - `db` [ObjectBox](http://objectbox.io) database helper classes
 - `di` Dependencies injection from [Dagger2](https://github.com/google/dagger)
-- `models` app models & db model
+- `models` app model classes
 - `services` location service & helper classes
 - `ui` views & viewmodels, follow [MVVM architecture](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) 
 - `utils` utilities & helper classes
