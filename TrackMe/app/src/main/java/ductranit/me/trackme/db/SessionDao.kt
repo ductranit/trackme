@@ -49,6 +49,10 @@ class SessionDao @Inject constructor(boxStore: BoxStore) {
         return ObjectBoxSingLiveData(builder.build())
     }
 
+    fun getSessions(): List<Session> {
+        return box.query().orderDesc(Session_.startTime).build().find()
+    }
+
     fun getAll(): ObjectBoxLiveData<Session> {
         return ObjectBoxLiveData(box.query().orderDesc(Session_.startTime).build())
     }
