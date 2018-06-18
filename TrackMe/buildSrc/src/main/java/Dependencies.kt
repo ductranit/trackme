@@ -49,6 +49,7 @@ object Version {
     val objectBox = "1.5.0"
     val objectBoxRxJava = "0.9.8"
     val timber = "4.7.0"
+    val dexter = "4.2.0"
 
     val junit = "4.12"
     val testRunner = "1.0.1"

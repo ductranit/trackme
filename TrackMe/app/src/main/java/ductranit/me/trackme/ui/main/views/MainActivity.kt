@@ -18,13 +18,20 @@ package ductranit.me.trackme.ui.main.views
 
 import android.Manifest
 import android.arch.lifecycle.Observer
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
+import android.provider.Settings
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.Toast
 import com.google.android.gms.maps.GoogleMap
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import ductranit.me.trackme.R
 import ductranit.me.trackme.databinding.ActivityMainBinding
 import ductranit.me.trackme.models.SessionDataManager
@@ -35,23 +42,20 @@ import ductranit.me.trackme.ui.tracking.views.TrackingActivity
 import ductranit.me.trackme.ui.widgets.VerticalSpaceItemDecoration
 import ductranit.me.trackme.utils.AppExecutors
 import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
-import ductranit.me.trackme.utils.Constants.Companion.PERMISSIONS_REQUEST
-import ductranit.me.trackme.utils.PermissionUtil
+import ductranit.me.trackme.utils.LocationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
 import kotlinx.android.synthetic.main.partial_app_bar.view.*
+import timber.log.Timber
 import javax.inject.Inject
 
-class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), PermissionUtil.PermissionAskListener {
+class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     private lateinit var adapter: SessionAdapter
     private var sessionId: Long = INVALID_ID
 
     @Inject
     lateinit var appExecutors: AppExecutors
-
-    @Inject
-    lateinit var permissionUtil: PermissionUtil
 
     @Inject
     lateinit var sessionDataManager: SessionDataManager
@@ -60,7 +64,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
         super.onCreate(savedInstanceState)
 
         // is running
-        if(sessionDataManager.state == State.PLAYING && sessionDataManager.sessionId != INVALID_ID) {
+        if (sessionDataManager.state == State.PLAYING && sessionDataManager.sessionId != INVALID_ID) {
             goToTracking(sessionDataManager.sessionId)
         }
 
@@ -132,40 +136,57 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
         return R.layout.activity_main
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == PERMISSIONS_REQUEST) {
-            if (permissionUtil.hasGrant(grantResults)) {
-                goToTracking(sessionId)
-            }
+    private fun onPermissionGranted() {
+        if(LocationUtils.isGPSEnable(this)) {
+            val intent = Intent(getActivity(), TrackingActivity::class.java)
+            startActivity(intent)
         } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            Toast.makeText(this, R.string.msg_gps_disable, Toast.LENGTH_LONG).show()
         }
     }
 
-    override fun onNeedPermission() {
-        ActivityCompat.requestPermissions(getActivity(),
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                PERMISSIONS_REQUEST)
-    }
-
-    override fun onPermissionPreviouslyDenied() {
-        Toast.makeText(getActivity(), R.string.msg_location_permission, Toast.LENGTH_LONG).show()
-        onNeedPermission()
-    }
-
-    override fun onPermissionDisabled() {
-        Toast.makeText(getActivity(), R.string.msg_location_permission_disable, Toast.LENGTH_LONG).show()
-        permissionUtil.goToAppSetting(this)
-    }
-
-    override fun onPermissionGranted() {
-        val intent = Intent(getActivity(), TrackingActivity::class.java)
-        sessionDataManager.sessionId = sessionId
-        startActivity(intent)
+    private fun goToAppSetting() {
+        try {
+            val intent = Intent()
+            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            val uri = Uri.fromParts("package", getActivity().packageName, null)
+            intent.data = uri
+            getActivity().startActivity(intent)
+        } catch (ex: ActivityNotFoundException) {
+            Timber.e(ex)
+        }
     }
 
     private fun goToTracking(sessionId: Long) {
         this.sessionId = sessionId
-        permissionUtil.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION, this)
+
+        Dexter.withActivity(this).withPermissions(Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                .withListener(object : MultiplePermissionsListener {
+                    override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                        if (report != null) {
+                            if (report.areAllPermissionsGranted()) {
+                                onPermissionGranted()
+                            } else {
+                                for (item in report.deniedPermissionResponses) {
+                                    if (item.isPermanentlyDenied) {
+                                        Toast.makeText(getActivity(), R.string.msg_location_permission_disable,
+                                                Toast.LENGTH_LONG).show()
+                                        goToAppSetting()
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onPermissionRationaleShouldBeShown(permissions: MutableList<PermissionRequest>?,
+                                                                    token: PermissionToken?) {
+
+                        Toast.makeText(getActivity(), R.string.msg_location_permission, Toast.LENGTH_LONG).show()
+                        token?.continuePermissionRequest()
+                    }
+
+                }).check()
     }
 }

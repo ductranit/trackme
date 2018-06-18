@@ -62,6 +62,7 @@ dependencies {
 
     implementation "io.objectbox:objectbox-rxjava:$Version.objectBoxRxJava"
     implementation "com.jakewharton.timber:timber:$Version.timber"
+    implementation "com.karumi:dexter:$Version.dexter"
 
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$Version.leakCanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$Version.leakCanary"
