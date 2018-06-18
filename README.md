@@ -30,6 +30,20 @@ Follow [Android Architecture Components sample](https://github.com/googlesamples
 - `buildSrc/Dependencies.kt` all versions of dependencies and app configurations
 - `src/test` unit tests
 
+# Getting Started
+- Download or clone this repo
+- Get the latest [android studio](https://developer.android.com/studio)
+- Open project from `android studio`
+- Follow [this guide](https://developers.google.com/maps/documentation/android-sdk/start)  and replace your google map api key in `google_maps_key` from `debug/res/values/google_maps_api.xml` & `release/res/values/google_maps_api.xml` 
+- Run command `gradlew build` to build or press `Run` button in `android studio`
+- If there is any build error, try to clean project with `gradlew clean`, then build again
+
+# Prerequisites
+- Android API Level >= 21
+- Android Build Tools >= v27
+- Google Support Repository
+- Kotlin >= `1.2.50`
+
 License
 -------
 
