@@ -46,7 +46,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
 
         // is running
         if(sessionDataManager.state == State.PLAYING && sessionDataManager.sessionId != INVALID_ID) {
-            goToTracking(sessionDataManager.sessionId, sessionDataManager.isAddNew)
+            goToTracking(sessionDataManager.sessionId)
             LocationService.start(this)
         }
 
@@ -56,13 +56,19 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
         }
 
         layoutMain.fabRecord.setOnClickListener {
-            goToTracking(INVALID_ID, true)
+            sessionDataManager.sessionId = INVALID_ID
+            sessionDataManager.isAddNew = true
+            sessionDataManager.state = State.PLAYING
+            goToTracking(INVALID_ID)
         }
 
         adapter = SessionAdapter(
                 appExecutors = appExecutors
         ) { session ->
-            goToTracking(session.id, false)
+            sessionDataManager.sessionId = session.id
+            sessionDataManager.isAddNew = false
+            sessionDataManager.state = State.DEFAULT
+            goToTracking(session.id)
         }
 
         rvSession.adapter = adapter
@@ -115,7 +121,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == PERMISSIONS_REQUEST) {
             if (permissionUtil.hasGrant(grantResults)) {
-                goToTracking(sessionId, sessionDataManager.isAddNew)
+                goToTracking(sessionId)
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -141,18 +147,11 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
     override fun onPermissionGranted() {
         val intent = Intent(getActivity(), TrackingActivity::class.java)
         sessionDataManager.sessionId = sessionId
-        if(sessionId == INVALID_ID) {
-            sessionDataManager.state = State.PLAYING
-        } else {
-            sessionDataManager.state = State.DEFAULT
-        }
-
         startActivity(intent)
     }
 
-    private fun goToTracking(sessionId: Long, isAddNew: Boolean) {
+    private fun goToTracking(sessionId: Long) {
         this.sessionId = sessionId
-        sessionDataManager.isAddNew = isAddNew
         permissionUtil.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION, this)
     }
 }
