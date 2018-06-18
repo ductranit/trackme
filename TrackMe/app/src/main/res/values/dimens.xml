@@ -4,4 +4,5 @@
     <dimen name="last_item_space">80dp</dimen>
     <dimen name="item_map_height">200dp</dimen>
     <dimen name="detail_map_height">400dp</dimen>
+    <dimen name="map_margin_bottom">80dp</dimen>
 </resources>
