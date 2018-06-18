@@ -35,6 +35,7 @@ import ductranit.me.trackme.ui.widgets.DataBoundViewHolder
 import ductranit.me.trackme.utils.AppExecutors
 import ductranit.me.trackme.utils.Constants.Companion.MARKER_CIRCLE_RADIUS
 import ductranit.me.trackme.utils.Constants.Companion.MAP_ZOOM_LEVEL
+import ductranit.me.trackme.utils.Constants.Companion.PATH_WIDTH
 
 class SessionAdapter(appExecutors: AppExecutors,
                      private val itemClickCallback: ((Session) -> Unit)?) :
@@ -91,7 +92,7 @@ class SessionAdapter(appExecutors: AppExecutors,
             DataBoundViewHolder<SessionItemBinding>(binding), OnMapReadyCallback {
         var googleMap: GoogleMap? = null
         private var options: PolylineOptions = PolylineOptions().visible(true).
-                width(5f).color(ContextCompat.getColor(binding.root.context,
+                width(PATH_WIDTH).color(ContextCompat.getColor(binding.root.context,
                 R.color.colorMapPath))
         private var polyLines: Polyline? = null
         private var firstPositionMarker: Marker? = null

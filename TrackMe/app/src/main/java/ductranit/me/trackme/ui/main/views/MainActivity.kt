@@ -48,11 +48,13 @@ import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
 import kotlinx.android.synthetic.main.partial_app_bar.view.*
 import timber.log.Timber
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     private lateinit var adapter: SessionAdapter
     private var sessionId: Long = INVALID_ID
+    private var permissionListener: PermissionListener? = null
 
     @Inject
     lateinit var appExecutors: AppExecutors
@@ -136,8 +138,13 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         return R.layout.activity_main
     }
 
+    override fun onDestroy() {
+        permissionListener = null
+        super.onDestroy()
+    }
+
     private fun onPermissionGranted() {
-        if(LocationUtils.isGPSEnable(this)) {
+        if (LocationUtils.isGPSEnable(this)) {
             val intent = Intent(getActivity(), TrackingActivity::class.java)
             startActivity(intent)
         } else {
@@ -159,34 +166,44 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
     private fun goToTracking(sessionId: Long) {
         this.sessionId = sessionId
+        permissionListener = PermissionListener(this)
 
         Dexter.withActivity(this).withPermissions(Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
-                .withListener(object : MultiplePermissionsListener {
-                    override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                        if (report != null) {
-                            if (report.areAllPermissionsGranted()) {
-                                onPermissionGranted()
-                            } else {
-                                for (item in report.deniedPermissionResponses) {
-                                    if (item.isPermanentlyDenied) {
-                                        Toast.makeText(getActivity(), R.string.msg_location_permission_disable,
-                                                Toast.LENGTH_LONG).show()
-                                        goToAppSetting()
-                                        break;
-                                    }
-                                }
-                            }
+                .withListener(permissionListener)
+                .check()
+
+    }
+
+    /**
+     * Have to use WeakReference because of memory leak from Dexter lib
+     * https://github.com/Karumi/Dexter/issues/197
+     */
+    private class PermissionListener(activity: MainActivity) : MultiplePermissionsListener {
+        private val weakReference: WeakReference<MainActivity> = WeakReference(activity)
+
+        override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+            if (report != null && weakReference.get() != null) {
+                if (report.areAllPermissionsGranted()) {
+                    weakReference.get()?.onPermissionGranted()
+                } else {
+                    for (item in report.deniedPermissionResponses) {
+                        if (item.isPermanentlyDenied) {
+                            Toast.makeText(weakReference.get()?.getActivity(), R.string.msg_location_permission_disable,
+                                    Toast.LENGTH_LONG).show()
+                            weakReference.get()?.goToAppSetting()
+                            break;
                         }
                     }
+                }
+            }
+        }
 
-                    override fun onPermissionRationaleShouldBeShown(permissions: MutableList<PermissionRequest>?,
-                                                                    token: PermissionToken?) {
-
-                        Toast.makeText(getActivity(), R.string.msg_location_permission, Toast.LENGTH_LONG).show()
-                        token?.continuePermissionRequest()
-                    }
-
-                }).check()
+        override fun onPermissionRationaleShouldBeShown(permissions: MutableList<PermissionRequest>?, token: PermissionToken?) {
+            if (weakReference.get() != null) {
+                Toast.makeText(weakReference.get()?.getActivity(), R.string.msg_location_permission, Toast.LENGTH_LONG).show()
+                token?.continuePermissionRequest()
+            }
+        }
     }
 }

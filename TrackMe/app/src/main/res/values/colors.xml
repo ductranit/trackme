@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#cc3300</color>
 
-    <color name="colorMapPath">#CC0000FF</color>
+    <color name="colorMapPath">#3333ff</color>
     <color name="colorCircleRadius">#ccddff</color>
 </resources>

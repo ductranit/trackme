@@ -42,6 +42,7 @@ import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LONGITUDE
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_SPEED
 import ductranit.me.trackme.utils.Constants.Companion.MAP_ZOOM_LEVEL
 import ductranit.me.trackme.utils.Constants.Companion.MARKER_CIRCLE_RADIUS
+import ductranit.me.trackme.utils.Constants.Companion.PATH_WIDTH
 import ductranit.me.trackme.utils.Constants.Companion.TIMER_TICK
 import ductranit.me.trackme.utils.converters.setDate
 import ductranit.me.trackme.utils.converters.setDateRange
@@ -143,7 +144,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         googleMap?.uiSettings?.setAllGesturesEnabled(true)
 
         options = PolylineOptions()
-        options?.width(5f)
+        options?.width(PATH_WIDTH)
         options?.visible(true)
         options?.color(ContextCompat.getColor(this, R.color.colorMapPath))
 

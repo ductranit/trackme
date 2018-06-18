@@ -23,9 +23,10 @@ class Constants {
         const val SHARE_PREF_NAME = "TrackMe_prefs"
         const val INVALID_ID = Long.MIN_VALUE
         const val MAP_ZOOM_LEVEL = 15f
-        const val MIN_DISTANCE = 2 // 2m
-        const val MARKER_CIRCLE_RADIUS = 40.0
+        const val MIN_DISTANCE = 3 // 3 meters
+        const val MARKER_CIRCLE_RADIUS = 30.0
         const val TIMER_TICK = 1000L
+        const val PATH_WIDTH = 5f
 
         // for location service
         const val KEY_REQUESTING_LOCATION_UPDATES = "KEY_REQUESTING_LOCATION_UPDATES"
@@ -55,8 +56,5 @@ class Constants {
          * The identifier for the notification displayed for the foreground service.
          */
         const val NOTIFICATION_ID = 12345678
-
-        // intent
-        const val PERMISSIONS_REQUEST = 1
     }
 }

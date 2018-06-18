@@ -49,6 +49,9 @@ class MainViewModel @Inject constructor(private val sessionDao: SessionDao) : Ba
         return sessions
     }
 
+    /**
+     * Load all sessions from background
+     */
     private fun loadSessions() {
         TraceUtils.begin("begin loadSessions")
         disposable = Observable.fromCallable {

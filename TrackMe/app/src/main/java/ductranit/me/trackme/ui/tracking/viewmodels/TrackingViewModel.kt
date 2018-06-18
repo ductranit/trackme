@@ -69,6 +69,7 @@ class TrackingViewModel @Inject constructor(private val sessionDataManager: Sess
     }
 
     fun stop() {
+        // update end date when stopping session
         val session = sessionDao.getSession(sessionId)
         session.endTime = Date()
         sessionDao.add(session)

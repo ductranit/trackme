@@ -21,6 +21,9 @@ import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ *  Singleton class contains current session information
+ */
 @Singleton
 class SessionDataManager @Inject constructor(){
     var sessionId: Long = INVALID_ID
