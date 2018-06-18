@@ -18,7 +18,6 @@ package ductranit.me.trackme.ui.tracking.views
 
 import android.arch.lifecycle.Observer
 import android.content.*
-import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.content.ContextCompat
@@ -38,7 +37,6 @@ import ductranit.me.trackme.ui.base.views.BaseActivity
 import ductranit.me.trackme.ui.tracking.State
 import ductranit.me.trackme.ui.tracking.viewmodels.TrackingViewModel
 import ductranit.me.trackme.utils.Constants.Companion.ACTION_BROADCAST
-import ductranit.me.trackme.utils.Constants.Companion.EXTRA_LOCATION
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LATITUDE
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LONGITUDE
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_SPEED
@@ -153,7 +151,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                     MAP_ZOOM_LEVEL))
         }
 
-        updateSpeed(preferences.getFloat(KEY_LOCATION_SPEED, 0.0f))
+        updateSpeed()
     }
 
     override fun onResume() {
@@ -278,7 +276,8 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         polyLines = googleMap?.addPolyline(options)
     }
 
-    fun updateSpeed(speed: Float?) {
+    fun updateSpeed() {
+        val speed = preferences.getFloat(KEY_LOCATION_SPEED, 0.0f)
         tvSpeed.setSpeed(speed)
     }
 
@@ -298,8 +297,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
 
     inner class LocationReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            val location = intent?.getSerializableExtra(EXTRA_LOCATION) as Location?
-            updateSpeed(location?.speed)
+            updateSpeed()
         }
     }
 

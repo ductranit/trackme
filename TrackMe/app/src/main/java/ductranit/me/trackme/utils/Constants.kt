@@ -35,7 +35,6 @@ class Constants {
 
         const val ACTION_CLEAR_NOTIFICATION = BuildConfig.APPLICATION_ID + ".clear_notification"
         const val ACTION_BROADCAST = BuildConfig.APPLICATION_ID + ".broadcast"
-        const val EXTRA_LOCATION = BuildConfig.APPLICATION_ID + ".location"
         /**
          * The name of the channel for notifications.
          */

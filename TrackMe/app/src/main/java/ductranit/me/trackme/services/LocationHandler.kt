@@ -82,16 +82,20 @@ class LocationHandler @Inject constructor(private val context: Context,
                 .subscribeOn(Schedulers.io())
                 .subscribe({ session ->
                     Timber.d("locationUpdating $location")
-                    val intent = Intent(Constants.ACTION_BROADCAST)
-                    intent.putExtra(Constants.EXTRA_LOCATION, location)
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+                    deliverLocationChange()
                     listener.onSessionReady(session)
                 }) { error ->
                     run {
                         Timber.e(error.message)
+                        deliverLocationChange()
                         listener.onSessionReady(null)
                     }
                 }
+    }
+
+    private fun deliverLocationChange() {
+        val intent = Intent(Constants.ACTION_BROADCAST)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
     private fun calculateDistance(locations: MutableList<HistoryLocation>): Double {
