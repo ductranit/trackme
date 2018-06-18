@@ -12,9 +12,10 @@
 [Download demo apk here](https://github.com/ductranit/trackme/blob/master/Demo/TrackMe.apk?raw=true)
 
 # Features
-- Recording work out session: route, speed, distance & time
+- Recording workout session: route, speed, distance & time
 - Store unlimited sessions
 - Can run on background
+- Save battery
 
 # Architecture
 Follow [Android Architecture Components sample](https://github.com/googlesamples/android-architecture-components)
@@ -47,7 +48,7 @@ Follow [Android Architecture Components sample](https://github.com/googlesamples
 License
 -------
 
-Copyright 2018 ductranit.
+Copyright 2018 ductranit
 
 Licensed to the Apache Software Foundation (ASF) under one or more contributor
 license agreements.  See the NOTICE file distributed with this work for
