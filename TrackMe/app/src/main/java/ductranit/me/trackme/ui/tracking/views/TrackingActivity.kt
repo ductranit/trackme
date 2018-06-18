@@ -80,7 +80,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
 
         layoutAppBar.toolbar?.apply {
             setSupportActionBar(layoutAppBar.toolbar)
-            if (!viewModel.isRecording) {
+            if (!sessionDataManager.isAddNew) {
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
             }
 
@@ -92,7 +92,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                 viewModel.getSession().observe(this, Observer { session ->
                     if (viewModel.isRecording) {
                         startTime = session?.startTime
-                        handler.post(timerRunnable)
+                        runTimer()
                     } else {
                         tvTime.setDateRange(session?.startTime, session?.endTime)
                     }
@@ -111,18 +111,18 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         mapView.getMapAsync(this)
 
         btnPause.setOnClickListener {
-            viewModel.state.value = State.PAUSE
             sessionDataManager.state = State.PAUSE
+            viewModel.state.value = State.PAUSE
         }
 
         btnStop.setOnClickListener {
-            viewModel.state.value = State.STOP
             sessionDataManager.state = State.STOP
+            viewModel.state.value = State.STOP
         }
 
         btnReplay.setOnClickListener {
-            viewModel.state.value = State.PLAYING
             sessionDataManager.state = State.PLAYING
+            viewModel.state.value = State.PLAYING
         }
     }
 
@@ -161,14 +161,12 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     override fun onResume() {
         super.onResume()
         mapView.onResume()
-        if (viewModel.isRecording) {
-            handler.post(timerRunnable)
-        }
+        runTimer()
     }
 
     override fun onPause() {
         mapView.onPause()
-        handler.removeCallbacks(timerRunnable)
+        stopTimer()
         super.onPause()
     }
 
@@ -186,7 +184,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
 
     override fun onDestroy() {
         mapView.onDestroy()
-        handler.removeCallbacks(timerRunnable)
+        stopTimer()
         super.onDestroy()
     }
 
@@ -215,9 +213,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                 btnStop.visibility = View.GONE
                 LocationService.start(this)
 
-                if (viewModel.isRecording) {
-                    handler.post(timerRunnable)
-                }
+                runTimer()
             }
 
             State.PAUSE -> {
@@ -225,12 +221,12 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                 btnReplay.visibility = View.VISIBLE
                 btnStop.visibility = View.VISIBLE
                 LocationService.stop(this)
-                handler.removeCallbacks(timerRunnable)
+                stopTimer()
             }
 
             State.STOP -> {
                 viewModel.stop()
-                handler.removeCallbacks(timerRunnable)
+                stopTimer()
                 LocationService.stop(this)
                 sessionDataManager.clear()
                 finish()
@@ -299,6 +295,16 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         unregisterReceiver(locationReceiver)
     }
 
+    private fun runTimer() {
+        if(viewModel.isEnableTimer) {
+            handler.post(timerRunnable)
+        }
+    }
+
+    private fun stopTimer() {
+        handler.removeCallbacks(timerRunnable)
+    }
+
     inner class LocationReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             updateSpeed()
@@ -308,7 +314,9 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     inner class TimerRunnable : Runnable {
         override fun run() {
             tvTime.setDate(startTime)
-            handler.postDelayed(this, TIMER_TICK)
+            if(viewModel.isEnableTimer) {
+                handler.postDelayed(this, TIMER_TICK)
+            }
         }
     }
 }

@@ -42,6 +42,10 @@ class TrackingViewModel @Inject constructor(private val sessionDataManager: Sess
     var sessionId: Long = INVALID_ID
 
     var isRecording: Boolean = true
+    var isEnableTimer: Boolean = true
+        get() {
+            return sessionDataManager.isAddNew && sessionDataManager.state == State.PLAYING
+        }
 
     /**
      * Use LiveData to lazy load session item
