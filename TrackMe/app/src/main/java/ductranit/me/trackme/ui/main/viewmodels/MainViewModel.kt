@@ -16,6 +16,10 @@ class MainViewModel @Inject constructor(private val sessionDao: SessionDao) : Ba
     private lateinit var sessions: ObjectBoxLiveData<Session>
     private var loaded: Boolean = false
     private var disposable: Disposable? = null
+
+    /**
+     * Use LiveData to lazy load session list
+     */
     var isLoaded: MutableLiveData<Boolean> = MutableLiveData()
         get() {
             if (!loaded) {

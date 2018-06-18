@@ -12,6 +12,7 @@ import com.google.android.gms.maps.GoogleMap
 import ductranit.me.trackme.R
 import ductranit.me.trackme.databinding.ActivityMainBinding
 import ductranit.me.trackme.models.SessionDataManager
+import ductranit.me.trackme.services.LocationService
 import ductranit.me.trackme.ui.base.views.BaseActivity
 import ductranit.me.trackme.ui.main.viewmodels.MainViewModel
 import ductranit.me.trackme.ui.tracking.State
@@ -20,7 +21,6 @@ import ductranit.me.trackme.ui.widgets.VerticalSpaceItemDecoration
 import ductranit.me.trackme.utils.AppExecutors
 import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
 import ductranit.me.trackme.utils.Constants.Companion.PERMISSIONS_REQUEST
-import ductranit.me.trackme.utils.Constants.Companion.SESSION_ID
 import ductranit.me.trackme.utils.PermissionUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -44,19 +44,25 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // is running
+        if(sessionDataManager.state == State.PLAYING && sessionDataManager.sessionId != INVALID_ID) {
+            goToTracking(sessionDataManager.sessionId, sessionDataManager.isAddNew)
+            LocationService.start(this)
+        }
+
         layoutAppBar.toolbar?.apply {
             setSupportActionBar(layoutAppBar.toolbar)
             supportActionBar?.title = getString(R.string.app_name)
         }
 
         layoutMain.fabRecord.setOnClickListener {
-            goToTracking(INVALID_ID)
+            goToTracking(INVALID_ID, true)
         }
 
         adapter = SessionAdapter(
                 appExecutors = appExecutors
         ) { session ->
-            goToTracking(session.id)
+            goToTracking(session.id, false)
         }
 
         rvSession.adapter = adapter
@@ -109,7 +115,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == PERMISSIONS_REQUEST) {
             if (permissionUtil.hasGrant(grantResults)) {
-                goToTracking(sessionId)
+                goToTracking(sessionId, sessionDataManager.isAddNew)
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -140,11 +146,13 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
         } else {
             sessionDataManager.state = State.DEFAULT
         }
+
         startActivity(intent)
     }
 
-    private fun goToTracking(sessionId: Long) {
+    private fun goToTracking(sessionId: Long, isAddNew: Boolean) {
         this.sessionId = sessionId
+        sessionDataManager.isAddNew = isAddNew
         permissionUtil.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION, this)
     }
 }

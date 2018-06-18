@@ -9,6 +9,7 @@ import javax.inject.Singleton
 class SessionDataManager @Inject constructor(){
     var sessionId: Long = INVALID_ID
     var state: State = State.DEFAULT
+    var isAddNew: Boolean = true
 
     fun clear(){
         sessionId = INVALID_ID

@@ -23,7 +23,6 @@ import ductranit.me.trackme.ui.tracking.State
 import ductranit.me.trackme.ui.tracking.viewmodels.TrackingViewModel
 import ductranit.me.trackme.utils.Constants.Companion.ACTION_BROADCAST
 import ductranit.me.trackme.utils.Constants.Companion.EXTRA_LOCATION
-import ductranit.me.trackme.utils.Constants.Companion.INVALID_ID
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LATITUDE
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_LONGITUDE
 import ductranit.me.trackme.utils.Constants.Companion.KEY_LOCATION_SPEED
@@ -60,17 +59,19 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.sessionId = sessionDataManager.sessionId
+        viewModel.isRecording = sessionDataManager.isAddNew
+        viewModel.state.observe(this, Observer { updateState() })
+        viewModel.state.value = sessionDataManager.state
 
         layoutAppBar.toolbar?.apply {
             setSupportActionBar(layoutAppBar.toolbar)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            if (!viewModel.isRecording) {
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
+
             supportActionBar?.title = getString(R.string.record)
         }
-
-        viewModel.sessionId = sessionDataManager.sessionId
-        viewModel.isRecording = sessionDataManager.sessionId == INVALID_ID
-        viewModel.state.observe(this, Observer { updateState() })
-        viewModel.state.value = sessionDataManager.state
 
         viewModel.getSession().observe(this, Observer { session ->
             if (viewModel.isRecording) {
@@ -107,6 +108,13 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
         }
     }
 
+    override fun onBackPressed() {
+        // can go back if user view history session
+        if (!viewModel.isRecording) {
+            super.onBackPressed()
+        }
+    }
+
     override fun onMapReady(map: GoogleMap?) {
         MapsInitializer.initialize(this)
         googleMap = map
@@ -135,7 +143,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
     override fun onResume() {
         super.onResume()
         mapView.onResume()
-        if(viewModel.isRecording) {
+        if (viewModel.isRecording) {
             handler.post(timerRunnable)
         }
     }
@@ -189,7 +197,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                 btnStop.visibility = View.GONE
                 LocationService.start(this)
 
-                if(viewModel.isRecording) {
+                if (viewModel.isRecording) {
                     handler.post(timerRunnable)
                 }
             }

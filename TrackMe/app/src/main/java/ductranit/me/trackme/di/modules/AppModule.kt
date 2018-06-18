@@ -24,6 +24,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
+import ductranit.me.trackme.GlobalApp
 import ductranit.me.trackme.models.MyObjectBox
 import ductranit.me.trackme.utils.Constants.Companion.SHARE_PREF_NAME
 import io.objectbox.BoxStore
@@ -35,6 +36,12 @@ class AppModule {
     @Singleton
     fun provideAppContext(app: Application): Context {
         return app
+    }
+
+    @Provides
+    @Singleton
+    fun provideGlobalApp(app: Application): GlobalApp {
+        return app as GlobalApp
     }
 
     @Provides
