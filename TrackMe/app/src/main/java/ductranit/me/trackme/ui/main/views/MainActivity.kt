@@ -47,7 +47,6 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(), Permiss
         // is running
         if(sessionDataManager.state == State.PLAYING && sessionDataManager.sessionId != INVALID_ID) {
             goToTracking(sessionDataManager.sessionId)
-            LocationService.start(this)
         }
 
         layoutAppBar.toolbar?.apply {

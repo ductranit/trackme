@@ -19,7 +19,6 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-
 interface LocationUpdating {
     fun onSessionReady(session: Session?)
 }
