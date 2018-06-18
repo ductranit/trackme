@@ -87,20 +87,24 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
             supportActionBar?.title = getString(R.string.record)
         }
 
-        viewModel.getSession().observe(this, Observer { session ->
-            if (viewModel.isRecording) {
-                startTime = session?.startTime
-                handler.post(timerRunnable)
-            } else {
-                tvTime.setDateRange(session?.startTime, session?.endTime)
-            }
+        viewModel.isLoaded.observe(this, Observer { isLoaded ->
+            if(isLoaded == true) {
+                viewModel.getSession().observe(this, Observer { session ->
+                    if (viewModel.isRecording) {
+                        startTime = session?.startTime
+                        handler.post(timerRunnable)
+                    } else {
+                        tvTime.setDateRange(session?.startTime, session?.endTime)
+                    }
 
-            session?.locations?.let {
-                updateLocations(it)
-            }
+                    session?.locations?.let {
+                        updateLocations(it)
+                    }
 
-            binding.layoutTracking?.session = session
-            binding.executePendingBindings()
+                    binding.layoutTracking?.session = session
+                    binding.executePendingBindings()
+                })
+            }
         })
 
         mapView.onCreate(savedInstanceState)
