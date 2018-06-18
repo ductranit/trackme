@@ -11,8 +11,19 @@ A work out tracking android application
 - Store unlimited sessions
 - Can run on background
 
-# Structure
+# Architecture
 Follow [Android Architecture Components sample](https://github.com/googlesamples/android-architecture-components)
+
+
+# Project structure
+- `db` [ObjectBox](http://objectbox.io) database helper classes
+- `di` Dependencies injection from [Dagger2](https://github.com/google/dagger)
+- `models` app models & db model
+- `services` location service & helper classes
+- `ui` views & viewmodels, follow [MVVM architecture](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) 
+- `utils` utilities & helper classes
+- `buildSrc/Dependencies.kt` all versions of dependencies and app configurations
+- `src/test` unit tests
 
 License
 -------
