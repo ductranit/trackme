@@ -29,13 +29,15 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
 class TrackingViewModel @Inject constructor(private val sessionDataManager: SessionDataManager,
                                             private val sessionDao: SessionDao) : BaseViewModel() {
     private lateinit var session: ObjectBoxSingLiveData<Session>
-    private var disposable: Disposable? = null
+    private var loadSessionDisposable: Disposable? = null
+    private var updateSessionDisposable: Disposable? = null
     private var loaded: Boolean = false
     var state: MutableLiveData<State> = MutableLiveData()
 
@@ -60,8 +62,9 @@ class TrackingViewModel @Inject constructor(private val sessionDataManager: Sess
         }
 
     override fun onCleared() {
+        loadSessionDisposable?.dispose()
+        updateSessionDisposable?.dispose()
         super.onCleared()
-        disposable?.dispose()
     }
 
     fun getSession(): ObjectBoxSingLiveData<Session> {
@@ -70,14 +73,20 @@ class TrackingViewModel @Inject constructor(private val sessionDataManager: Sess
 
     fun stop() {
         // update end date when stopping session
-        val session = sessionDao.getSession(sessionId)
-        session.endTime = Date()
-        sessionDao.add(session)
+        updateSessionDisposable = Observable.fromCallable {
+            val session = sessionDao.getSession(sessionId)
+            session.endTime = Date()
+            sessionDao.add(session)
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    Timber.d("Update session finish")
+                }
     }
 
     private fun loadSession() {
         TraceUtils.begin("begin loadSession")
-        disposable = Observable.fromCallable {
+        loadSessionDisposable = Observable.fromCallable {
             if (sessionId == INVALID_ID || !sessionDao.contains(sessionId)) {
                 val sessionValue = Session()
                 sessionValue.startTime = Date()

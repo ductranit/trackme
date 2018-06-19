@@ -48,7 +48,7 @@ Follow [Android Architecture Components sample](https://github.com/googlesamples
 License
 -------
 
-Copyright 2018 ductranit
+Copyright (C) 2018 ductranit
 
 Licensed to the Apache Software Foundation (ASF) under one or more contributor
 license agreements.  See the NOTICE file distributed with this work for
