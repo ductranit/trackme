@@ -28,11 +28,16 @@ class Constants {
         const val TIMER_TICK = 1000L
         const val PATH_WIDTH = 5f
 
+        // for session manager
+        const val KEY_SESSION_ID = "session_id"
+        const val KEY_SESSION_STATE = "session_state"
+        const val KEY_SESSION_IS_ADD_NEW = "is_add_new"
+
         // for location service
-        const val KEY_REQUESTING_LOCATION_UPDATES = "KEY_REQUESTING_LOCATION_UPDATES"
-        const val KEY_LOCATION_LATITUDE = "KEY_LOCATION_LATITUDE"
-        const val KEY_LOCATION_LONGITUDE = "KEY_LOCATION_LONGITUDE"
-        const val KEY_LOCATION_SPEED = "KEY_LOCATION_SPEED"
+        const val KEY_REQUESTING_LOCATION_UPDATES = "request_location_updates"
+        const val KEY_LOCATION_LATITUDE = "location_latitude"
+        const val KEY_LOCATION_LONGITUDE = "location_longitude"
+        const val KEY_LOCATION_SPEED = "location_speed"
 
         const val ACTION_CLEAR_NOTIFICATION = BuildConfig.APPLICATION_ID + ".clear_notification"
         const val ACTION_BROADCAST = BuildConfig.APPLICATION_ID + ".broadcast"

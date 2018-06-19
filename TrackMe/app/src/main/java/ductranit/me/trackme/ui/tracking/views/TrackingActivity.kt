@@ -93,6 +93,7 @@ class TrackingActivity : BaseActivity<ActivityTrackingBinding, TrackingViewModel
                 viewModel.getSession().observe(this, Observer { session ->
                     if (viewModel.isRecording) {
                         startTime = session?.startTime
+                        tvTime.setDate(startTime)
                         runTimer()
                     } else {
                         tvTime.setDateRange(session?.startTime, session?.endTime)

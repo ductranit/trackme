@@ -23,3 +23,9 @@ fun SharedPreferences.Editor.putDouble(key: String, double: Double) =
 
 fun SharedPreferences.getDouble(key: String, default: Double) =
         java.lang.Double.longBitsToDouble(getLong(key, java.lang.Double.doubleToRawLongBits(default)))
+
+inline fun <reified T : Enum<T>> SharedPreferences.getEnum(key: String, default: T) =
+        this.getInt(key, -1).let { if (it >= 0) enumValues<T>()[it] else default }
+
+fun <T : Enum<T>> SharedPreferences.Editor.putEnum(key: String, value: T?): SharedPreferences.Editor =
+        this.putInt(key, value?.ordinal ?: -1)

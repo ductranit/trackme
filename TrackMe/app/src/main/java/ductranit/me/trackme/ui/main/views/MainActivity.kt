@@ -66,7 +66,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         super.onCreate(savedInstanceState)
 
         // is running
-        if (sessionDataManager.state == State.PLAYING && sessionDataManager.sessionId != INVALID_ID) {
+        if (sessionDataManager.isAddNew && sessionDataManager.sessionId != INVALID_ID) {
             goToTracking(sessionDataManager.sessionId)
         }
 
@@ -192,7 +192,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
                             Toast.makeText(weakReference.get()?.getActivity(), R.string.msg_location_permission_disable,
                                     Toast.LENGTH_LONG).show()
                             weakReference.get()?.goToAppSetting()
-                            break;
+                            break
                         }
                     }
                 }
